@@ -239,7 +239,7 @@ export default function ProductsClient({ initialProducts, isFeatured = false }: 
       y: 0,
       scale: 1,
       transition: {
-        type: "spring",,
+        type: "spring",
         damping: 20,
         stiffness: 300,
         duration: 0.4,

@@ -15,7 +15,6 @@ interface PageProps {
 }
 
 export default function ProductPage({ params }: PageProps) {
-  const { handle } = params;
   const [product, setProduct] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [selectedImage, setSelectedImage] = useState(0);
@@ -27,7 +26,7 @@ export default function ProductPage({ params }: PageProps) {
   useEffect(() => {
     const loadProduct = async () => {
       try {
-        const data = await fetchProductByHandle(handle);
+        const data = await fetchProductByHandle(params.handle);
         setProduct(data);
       } catch (error) {
         console.error('Error loading product:', error);
@@ -36,7 +35,7 @@ export default function ProductPage({ params }: PageProps) {
       }
     };
     loadProduct();
-  }, [handle]);
+  }, [params.handle]);
 
   const handleAddToCart = () => {
     if (isAdding) return;

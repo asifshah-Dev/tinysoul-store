@@ -88,7 +88,7 @@ export default function Navbar() {
       x: -80,
       transition: {
         duration: 0.3,
-        ease: [0.4, 0, 0.2, 1]
+        ease: "easeInOut"
       }
     },
     visible: {
@@ -96,7 +96,7 @@ export default function Navbar() {
       x: 0,
       transition: {
         duration: 0.4,
-        ease: [0.4, 0, 0.2, 1]
+        ease: "easeInOut"
       }
     },
     exit: {
@@ -104,7 +104,7 @@ export default function Navbar() {
       x: -80,
       transition: {
         duration: 0.3,
-        ease: [0.4, 0, 0.2, 1]
+        ease: "easeInOut"
       }
     }
   };
@@ -114,21 +114,21 @@ export default function Navbar() {
       opacity: 0,
       transition: {
         duration: 0.3,
-        ease: [0.4, 0, 0.2, 1]
+        ease: "easeInOut"
       }
     },
     visible: {
       opacity: 1,
       transition: {
         duration: 0.4,
-        ease: [0.4, 0, 0.2, 1]
+        ease: "easeInOut"
       }
     },
     exit: {
       opacity: 0,
       transition: {
         duration: 0.3,
-        ease: [0.4, 0, 0.2, 1]
+        ease: "easeInOut"
       }
     }
   };
@@ -140,7 +140,7 @@ export default function Navbar() {
       scale: 0.95,
       transition: {
         duration: 0.25,
-        ease: [0.4, 0, 0.2, 1]
+        ease: "easeInOut"
       }
     },
     visible: {
@@ -149,7 +149,7 @@ export default function Navbar() {
       scale: 1,
       transition: {
         duration: 0.35,
-        ease: [0.4, 0, 0.2, 1]
+        ease: "easeInOut"
       }
     },
     exit: {
@@ -158,7 +158,7 @@ export default function Navbar() {
       scale: 0.95,
       transition: {
         duration: 0.25,
-        ease: [0.4, 0, 0.2, 1]
+        ease: "easeInOut"
       }
     }
   };
@@ -169,7 +169,7 @@ export default function Navbar() {
       x: -20,
       transition: {
         duration: 0.2,
-        ease: [0.4, 0, 0.2, 1]
+        ease: "easeInOut"
       }
     },
     visible: (i: number) => ({
@@ -178,7 +178,7 @@ export default function Navbar() {
       transition: {
         delay: i * 0.08,
         duration: 0.3,
-        ease: [0.4, 0, 0.2, 1]
+        ease: "easeInOut"
       }
     }),
     exit: (i: number) => ({
@@ -187,7 +187,7 @@ export default function Navbar() {
       transition: {
         delay: i * 0.05,
         duration: 0.2,
-        ease: [0.4, 0, 0.2, 1]
+        ease: "easeInOut"
       }
     })
   };
@@ -220,7 +220,7 @@ export default function Navbar() {
                   <motion.div
                     initial={{ rotate: -90, opacity: 0 }}
                     animate={{ rotate: 0, opacity: 1 }}
-                    transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
+                    transition={{ duration: 0.3, ease: "easeInOut" }}
                   >
                     <X className="w-7 h-7 md:w-8 md:h-8 text-teal-700" />
                   </motion.div>
@@ -228,7 +228,7 @@ export default function Navbar() {
                   <motion.div
                     initial={{ rotate: 90, opacity: 0 }}
                     animate={{ rotate: 0, opacity: 1 }}
-                    transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
+                    transition={{ duration: 0.3, ease: "easeInOut" }}
                   >
                     <Menu className="w-7 h-7 md:w-8 md:h-8 text-teal-700" />
                   </motion.div>

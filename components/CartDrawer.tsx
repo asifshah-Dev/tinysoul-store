@@ -115,7 +115,7 @@ export default function CartDrawer() {
                       >
                         {item.title}
                       </Link>
-                      {item.selectedOptions && item.selectedOptions.length > 0 && (
+                      {item.selectedOptions && item.selectedOptions?.length > 0 && (
                         <div className="text-xs text-gray-500 mt-1">
                           {item.selectedOptions.map((opt, i) => (
                             <span key={i}>

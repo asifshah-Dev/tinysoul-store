@@ -9,9 +9,9 @@ import { fetchProductByHandle } from '@/lib/data-source';
 import { useCart } from '@/context/CartContext';
 
 interface PageProps {
-  params: {
+  params: Promise<{
     handle: string;
-  };
+  }>;
 }
 
 export default function ProductPage({ params }: PageProps) {
@@ -86,9 +86,7 @@ export default function ProductPage({ params }: PageProps) {
   const allImages = product.images?.edges?.map((edge: any) => edge.node.url) || [];
   const mainImage = allImages[selectedImage] || product.image || '';
 
-  // Calculate total price based on quantity
-  const unitPrice = parseFloat(price);
-  const totalPrice = unitPrice * quantity;
+  const totalPrice = parseFloat(price) * quantity;
 
   return (
     <div className="min-h-screen">
@@ -96,13 +94,12 @@ export default function ProductPage({ params }: PageProps) {
         <nav className="text-sm text-gray-500 mb-6">
           <Link href="/" className="hover:text-teal-600 transition-colors">Home</Link>
           <span className="mx-2">/</span>
-          <Link href="/product" className="hover:text-teal-600 transition-colors">Products</Link>
+          <Link href="/products" className="hover:text-teal-600 transition-colors">Products</Link>
           <span className="mx-2">/</span>
           <span className="text-gray-800 font-medium line-clamp-1">{product.title}</span>
         </nav>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12 p-6 md:p-8 border border-gray-100 rounded-2xl">
-          {/* Product Images */}
           <div>
             <div className="relative h-96 rounded-xl overflow-hidden">
               {mainImage ? (
@@ -143,7 +140,6 @@ export default function ProductPage({ params }: PageProps) {
             )}
           </div>
           
-          {/* Product Info */}
           <div>
             <h1 className="text-3xl md:text-4xl font-bold text-gray-900">
               {product.title.split('|')[0]?.trim() || product.title}
@@ -155,7 +151,7 @@ export default function ProductPage({ params }: PageProps) {
               </span>
               {quantity > 1 && (
                 <span className="text-sm text-gray-400 ml-2">
-                  (Rs {unitPrice.toLocaleString()} × {quantity})
+                  (Rs {parseFloat(price).toLocaleString()} × {quantity})
                 </span>
               )}
             </div>
@@ -171,7 +167,6 @@ export default function ProductPage({ params }: PageProps) {
               </div>
             )}
             
-            {/* Quantity Selector */}
             <div className="mt-6">
               <label className="text-sm font-medium text-gray-700 block mb-2">Quantity</label>
               <div className="flex items-center gap-3">
@@ -192,7 +187,6 @@ export default function ProductPage({ params }: PageProps) {
               </div>
             </div>
             
-            {/* Add to Cart Button */}
             <div className="mt-6">
               {errorMsg && (
                 <div className={`text-sm text-center mb-3 ${errorMsg.includes('✅') ? 'text-green-600' : 'text-red-500'}`}>

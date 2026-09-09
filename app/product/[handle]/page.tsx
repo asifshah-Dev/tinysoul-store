@@ -3,19 +3,19 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { useState, useEffect, use } from 'react';
+import { useState, useEffect } from 'react';
 import { ShoppingBag, Plus, Minus } from 'lucide-react';
 import { fetchProductByHandle } from '@/lib/data-source';
 import { useCart } from '@/context/CartContext';
 
 interface PageProps {
-  params: Promise<{
+  params: {
     handle: string;
-  }>;
+  };
 }
 
 export default function ProductPage({ params }: PageProps) {
-  const { handle } = use(params);
+  const { handle } = params;
   const [product, setProduct] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [selectedImage, setSelectedImage] = useState(0);

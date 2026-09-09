@@ -42,6 +42,9 @@ export async function fetchProducts(): Promise<Product[]> {
       // Get price from first variant or direct price
       const priceAmount = p.variants?.[0]?.price || p.price || '0';
       
+      // Get first variant id
+      const variantId = p.variants?.[0]?.id || p.id || '';
+      
       return {
         id: p.id || '',
         title: p.title || '',
@@ -54,7 +57,7 @@ export async function fetchProducts(): Promise<Product[]> {
         variants: {
           edges: (p.variants || []).map((v: any) => ({
             node: {
-              id: v.id || '',
+              id: v.id || variantId || p.id || '',
               price: {
                 amount: v.price || priceAmount,
               },

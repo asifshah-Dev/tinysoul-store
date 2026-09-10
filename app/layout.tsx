@@ -4,6 +4,7 @@ import Image from 'next/image';
 import { CartProvider } from '@/context/CartContext';
 import Navbar from '@/components/Navbar';
 import CartDrawer from '@/components/CartDrawer';
+import LoadingScreen from '@/components/LoadingScreen';
 import './globals.css';
 
 export const metadata: Metadata = {
@@ -20,6 +21,7 @@ export default function RootLayout({
     <html lang="en">
       <body>
         <CartProvider>
+          <LoadingScreen />
           <Navbar />
           {children}
           <CartDrawer />

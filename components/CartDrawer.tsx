@@ -110,7 +110,7 @@ export default function CartDrawer() {
                     <div className="flex-1 min-w-0">
                       <Link
                         href={`/product/${item.handle}`}
-                        className="font-medium text-gray-800 hover:text-teal-600 transition-colors line-clamp-1"
+                        className="font-medium text-gray-800 hover:text-black transition-colors line-clamp-1"
                         onClick={closeCart}
                       >
                         {item.title}
@@ -180,26 +180,26 @@ export default function CartDrawer() {
 
                 <div className="flex justify-between text-lg font-bold pt-2 border-t border-gray-200">
                   <span className="text-gray-800">Total</span>
-                  <span className="text-teal-600">
+                  <span className="text-black">
                     {formatPrice(cartTotal)}
                   </span>
                 </div>
 
                 <div className="flex gap-3">
-                  <button
-                    onClick={closeCart}
-                    className="flex-1 px-6 py-3 border border-gray-300 text-gray-700 rounded-xl font-medium hover:bg-gray-50 transition-colors"
-                  >
-                    Continue Shopping
-                  </button>
-                  <Link
-                    href="/checkout"
-                    onClick={closeCart}
-                    className="flex-1 px-6 py-3 bg-black text-white rounded-xl font-medium hover:bg-gray-800 transition-colors text-center"
-                  >
-                    Checkout
-                  </Link>
-                </div>
+  <button
+    onClick={closeCart}
+    className="flex-1 px-6 py-3 bg-black text-white rounded-xl font-medium hover:bg-gray-800 transition-colors"
+  >
+    Continue Shopping
+  </button>
+  <Link
+    href="/checkout"
+    onClick={closeCart}
+    className="flex-1 px-6 py-3 bg-black text-white rounded-xl font-medium hover:bg-gray-800 transition-colors text-center"
+  >
+    Checkout
+  </Link>
+</div>
 
                 <button
                   onClick={clearCart}

@@ -1,132 +1,272 @@
 @import "tailwindcss";
 
-/* Custom Theme Colors - Restored */
+/* ============================================================
+   TINY SOUL — brand palette, extracted from the "T ♥ S" logo
+   Sun-yellow · Grass green · Bubblegum pink · Play orange ·
+   Sky blue · Grape purple (accent only) — on a warm cream field.
+   This is the ONLY color source for the site. No second palette
+   should ever be layered underneath this one.
+   ============================================================ */
 @theme {
-  --color-teal-50: #f0fdfa;
-  --color-teal-100: #ccfbf1;
-  --color-teal-200: #99f6e4;
-  --color-teal-300: #5eead4;
-  --color-teal-400: #2dd4bf;
-  --color-teal-500: #14b8a6;
-  --color-teal-600: #0d9488;
-  --color-teal-700: #0f766e;
-  --color-teal-800: #115e59;
-  --color-teal-900: #134e4a;
-  
-  --color-cream-50: #fefcf5;
-  --color-cream-100: #fdf6e3;
-  --color-cream-200: #f9edc7;
-  --color-cream-300: #f5e4ab;
-  --color-cream-400: #f1db8f;
-  --color-cream-500: #edd273;
-  --color-cream-600: #e5c947;
-  --color-cream-700: #d4b820;
-  --color-cream-800: #b39b1b;
-  --color-cream-900: #8a7815;
-  
-  --color-coral-50: #fef6f3;
-  --color-coral-100: #fde8e3;
-  --color-coral-200: #fccfc7;
-  --color-coral-300: #fbb6ab;
-  --color-coral-400: #fa9d8f;
-  --color-coral-500: #f98473;
-  --color-coral-600: #f56b57;
-  --color-coral-700: #e8523b;
-  --color-coral-800: #d1391f;
-  --color-coral-900: #ba2003;
+  /* ---- SUN YELLOW — the sun face, the T ---- */
+  --color-sun-50:  #fffaf0;
+  --color-sun-100: #fff2d1;
+  --color-sun-200: #ffe4a3;
+  --color-sun-300: #ffd66b;
+  --color-sun-400: #ffc93c;
+  --color-sun-500: #f5b400;
+  --color-sun-600: #d99a00;
+  --color-sun-700: #a87600;
+  --color-sun-800: #7a5500;
+  --color-sun-900: #4d3500;
+
+  /* ---- PLAY ORANGE — "Tiny", S highlight ---- */
+  --color-play-50:  #fff5ed;
+  --color-play-100: #ffe5d1;
+  --color-play-200: #ffc8a3;
+  --color-play-300: #ffa970;
+  --color-play-400: #ff8c42;
+  --color-play-500: #f4713a;
+  --color-play-600: #d9531f;
+  --color-play-700: #a83f18;
+  --color-play-800: #7a2d11;
+  --color-play-900: #4d1c0b;
+
+  /* ---- GRASS GREEN — T diagonal stripe ---- */
+  --color-grass-50:  #f3fbf3;
+  --color-grass-100: #ddf5dd;
+  --color-grass-200: #b8e8b8;
+  --color-grass-300: #8ed48e;
+  --color-grass-400: #5cb85c;
+  --color-grass-500: #459f45;
+  --color-grass-600: #368036;
+  --color-grass-700: #2a632a;
+  --color-grass-800: #1e471e;
+  --color-grass-900: #142e14;
+
+  /* ---- BUBBLEGUM PINK — T stripe, top of S ---- */
+  --color-bubble-50:  #fff2f7;
+  --color-bubble-100: #ffdcea;
+  --color-bubble-200: #ffb8d3;
+  --color-bubble-300: #ff8fb8;
+  --color-bubble-400: #ff6b9d;
+  --color-bubble-500: #ec4d82;
+  --color-bubble-600: #c93a68;
+  --color-bubble-700: #a02d51;
+  --color-bubble-800: #77213c;
+  --color-bubble-900: #4d1526;
+
+  /* ---- SKY BLUE — "Soul", bottom swirl of S ---- */
+  --color-sky-50:  #eff9fe;
+  --color-sky-100: #d4eefb;
+  --color-sky-200: #a8ddf5;
+  --color-sky-300: #6ec4ec;
+  --color-sky-400: #3ba9e0;
+  --color-sky-500: #1a8cc7;
+  --color-sky-600: #156fa0;
+  --color-sky-700: #105579;
+  --color-sky-800: #0c3d57;
+  --color-sky-900: #082738;
+
+  /* ---- GRAPE PURPLE — star sparkle accent ONLY ---- */
+  --color-grape-50:  #f8f2fb;
+  --color-grape-100: #eeddf5;
+  --color-grape-200: #dbbceb;
+  --color-grape-300: #c291db;
+  --color-grape-400: #9b59b6;
+  --color-grape-500: #8344a0;
+  --color-grape-600: #6a3681;
+  --color-grape-700: #512a63;
+  --color-grape-800: #3a1e47;
+  --color-grape-900: #24122c;
+
+  /* ---- CREAM — the neutral field the logo sits on ---- */
+  --color-cream-50:  #fffdf7;
+  --color-cream-100: #fff9ec;
+  --color-cream-200: #fdf1d8;
+  --color-cream-300: #f5e6c8;
+  --color-cream-400: #d9c9a5;
+  --color-cream-500: #b8a67e;
+  --color-cream-600: #948362;
+  --color-cream-700: #6f6248;
+  --color-cream-800: #4d4332;
+  --color-cream-900: #2b2b2b;
 }
 
-/* ===== GLOBAL FONT COLORS ===== */
+/* ============================================================
+   BASE
+   ============================================================ */
 html, body {
-  color: #1a1a1a !important;
-  background-color: #fefcf5;
+  background-color: var(--color-cream-50);
+  color: var(--color-cream-900);
+  -webkit-font-smoothing: antialiased;
 }
 
-/* Headings - Teal */
 h1, h2, h3, h4, h5, h6 {
-  color: #0f766e !important;
-  font-weight: 700 !important;
+  color: var(--color-cream-900);
+  font-weight: 800;
+  letter-spacing: -0.02em;
 }
 
-/* Paragraphs - Dark Gray */
-p {
-  color: #1a1a1a !important;
+p { color: var(--color-cream-700); }
+
+.text-muted { color: var(--color-cream-500); }
+label { color: var(--color-cream-900); font-weight: 500; }
+
+/* Named heading accents — use ONE per heading, never combine */
+.heading-play  { color: var(--color-play-600); }
+.heading-sky   { color: var(--color-sky-600); }
+.heading-grass { color: var(--color-grass-600); }
+
+/* Hero-level gradient heading, echoes the "Soul" wordmark */
+.heading-gradient {
+  background: linear-gradient(90deg, var(--color-play-500) 0%, var(--color-bubble-500) 50%, var(--color-sky-500) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
 }
 
-/* Links - Coral */
+/* ============================================================
+   LINKS
+   ============================================================ */
 a {
-  color: #e8523b !important;
-  font-weight: 500;
-  transition: all 0.3s ease;
+ 
+  font-weight: 600;
+  transition: color 200ms ease;
 }
-a:hover {
-  color: #0f766e !important;
+a:hover {  }
+
+a.nav-link, a.footer-link { color: var(--color-cream-900); }
+a.nav-link:hover, a.footer-link:hover { color: var(--color-play-600); }
+
+/* ============================================================
+   BUTTONS — five solid brand tones, pill-shaped, glossy
+   ============================================================ */
+.btn-sun {
+  background: var(--color-sun-400); color: var(--color-cream-900);
+  font-weight: 700; border-radius: 9999px;
+  box-shadow: 0 4px 14px -4px rgba(245, 180, 0, 0.45);
+  transition: background 200ms ease, transform 150ms ease;
+}
+.btn-sun:hover { background: var(--color-sun-500); transform: translateY(-1px); }
+
+.btn-play {
+  background: var(--color-play-500); color: #ffffff;
+  font-weight: 700; border-radius: 9999px;
+  box-shadow: 0 4px 14px -4px rgba(244, 113, 58, 0.5);
+  transition: background 200ms ease, transform 150ms ease;
+}
+.btn-play:hover { background: var(--color-play-600); transform: translateY(-1px); }
+
+.btn-grass {
+  background: var(--color-grass-400); color: #ffffff;
+  font-weight: 700; border-radius: 9999px;
+  box-shadow: 0 4px 14px -4px rgba(92, 184, 92, 0.45);
+  transition: background 200ms ease, transform 150ms ease;
+}
+.btn-grass:hover { background: var(--color-grass-500); transform: translateY(-1px); }
+
+.btn-bubble {
+  background: var(--color-bubble-400); color: #ffffff;
+  font-weight: 700; border-radius: 9999px;
+  box-shadow: 0 4px 14px -4px rgba(255, 107, 157, 0.5);
+  transition: background 200ms ease, transform 150ms ease;
+}
+.btn-bubble:hover { background: var(--color-bubble-500); transform: translateY(-1px); }
+
+.btn-sky {
+  background: var(--color-sky-400); color: #ffffff;
+  font-weight: 700; border-radius: 9999px;
+  box-shadow: 0 4px 14px -4px rgba(59, 169, 224, 0.5);
+  transition: background 200ms ease, transform 150ms ease;
+}
+.btn-sky:hover { background: var(--color-sky-500); transform: translateY(-1px); }
+
+.btn-secondary {
+  background: transparent; color: var(--color-cream-900);
+  border: 1.5px solid var(--color-cream-300);
+  border-radius: 9999px; font-weight: 700;
+  transition: border-color 200ms ease, color 200ms ease, background 200ms ease;
+}
+.btn-secondary:hover {
+  border-color: var(--color-play-500);
+  color: var(--color-play-600);
+  background: var(--color-play-50);
 }
 
-/* Product Titles - Teal */
-.product-title {
-  color: #0f766e !important;
-  font-weight: 600 !important;
+/* ============================================================
+   PRODUCT UTILITIES
+   ============================================================ */
+.product-title { color: var(--color-cream-900); font-weight: 600; }
+.product-price { color: var(--color-play-600); font-weight: 700; }
+
+/* ============================================================
+   SECTION BACKGROUNDS — one bold wash at a time, not stacked
+   ============================================================ */
+.section-sun   { background: linear-gradient(180deg, var(--color-sun-50) 0%, var(--color-sun-100) 100%); }
+.section-bubble{ background: linear-gradient(180deg, var(--color-bubble-50) 0%, var(--color-bubble-100) 100%); }
+.section-sky   { background: linear-gradient(180deg, var(--color-sky-50) 0%, var(--color-sky-100) 100%); }
+.section-grass { background: linear-gradient(180deg, var(--color-grass-50) 0%, var(--color-grass-100) 100%); }
+.section-cream { background: linear-gradient(180deg, var(--color-cream-50) 0%, var(--color-cream-200) 100%); }
+
+/* Soft blurred color blobs — use ONE per composition for ambience */
+.blob-sun    { background: radial-gradient(circle, rgba(255, 201, 60, 0.4) 0%, transparent 70%); }
+.blob-bubble { background: radial-gradient(circle, rgba(255, 107, 157, 0.35) 0%, transparent 70%); }
+.blob-sky    { background: radial-gradient(circle, rgba(59, 169, 224, 0.35) 0%, transparent 70%); }
+.blob-grass  { background: radial-gradient(circle, rgba(92, 184, 92, 0.3) 0%, transparent 70%); }
+
+/* ============================================================
+   CARDS & SURFACES
+   ============================================================ */
+.surface-card {
+  background: #ffffff;
+  border: 1px solid var(--color-cream-200);
+  border-radius: 20px;
+  box-shadow: 0 4px 20px -8px rgba(43, 43, 43, 0.08);
+  transition: box-shadow 200ms ease, transform 200ms ease;
+}
+.surface-card:hover {
+  box-shadow: 0 12px 28px -10px rgba(43, 43, 43, 0.14);
+  transform: translateY(-2px);
 }
 
-/* Product Prices - Coral */
-.product-price {
-  color: #e8523b !important;
-  font-weight: 700 !important;
-}
+.surface-card-sun    { background: #ffffff; border: 1.5px solid var(--color-sun-200);    border-radius: 20px; box-shadow: 0 8px 24px -10px rgba(245, 180, 0, 0.18); }
+.surface-card-bubble { background: #ffffff; border: 1.5px solid var(--color-bubble-200); border-radius: 20px; box-shadow: 0 8px 24px -10px rgba(236, 77, 130, 0.18); }
+.surface-card-sky    { background: #ffffff; border: 1.5px solid var(--color-sky-200);    border-radius: 20px; box-shadow: 0 8px 24px -10px rgba(26, 140, 199, 0.18); }
+.surface-card-grass  { background: #ffffff; border: 1.5px solid var(--color-grass-200);  border-radius: 20px; box-shadow: 0 8px 24px -10px rgba(69, 159, 69, 0.18); }
 
-/* Labels - Teal */
-label {
-  color: #0f766e !important;
-  font-weight: 500;
-}
+/* ============================================================
+   BADGES
+   ============================================================ */
+.badge-instock { background: var(--color-grass-100); color: var(--color-grass-700); }
+.badge-new     { background: var(--color-bubble-100); color: var(--color-bubble-700); }
+.badge-sale    { background: var(--color-sun-100); color: var(--color-sun-800); }
 
-/* Muted Text */
-.text-muted {
-  color: #6b7280 !important;
-}
-
-/* Buttons - Teal */
-.btn-primary {
-  background: #0f766e !important;
-  color: #ffffff !important;
-}
-.btn-primary:hover {
-  background: #134e4a !important;
-}
-
-/* In Stock Badge */
-.badge-instock {
-  background: #ccfbf1 !important;
-  color: #0f766e !important;
-}
-
-/* Placeholder */
+/* ============================================================
+   FORMS
+   ============================================================ */
 input::placeholder,
-textarea::placeholder {
-  color: #a1a1aa !important;
+textarea::placeholder { color: var(--color-cream-500); }
+
+input, textarea, select {
+  background-color: #ffffff;
+  border: 1.5px solid var(--color-cream-300);
+  color: var(--color-cream-900);
+  transition: border-color 200ms ease, box-shadow 200ms ease;
+}
+input:focus, textarea:focus, select:focus {
+  border-color: var(--color-play-500);
+  box-shadow: 0 0 0 3px rgba(244, 113, 58, 0.2);
+  outline: none;
 }
 
-/* Selection */
 ::selection {
-  background: #0f766e;
-  color: #ffffff;
+  background: var(--color-play-300);
+  color: var(--color-cream-900);
 }
 
-/* Scrollbar */
-.no-scrollbar::-webkit-scrollbar {
-  display: none;
-}
-.no-scrollbar {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
-}
-/* Remove any cream background from globals.css */
-html, body {
-  background-color: transparent !important;
-}
-
-/* Remove any other cream colors */
-.bg-cream-50 {
-  background-color: transparent !important;
-}
+/* ============================================================
+   UTILITIES
+   ============================================================ */
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }

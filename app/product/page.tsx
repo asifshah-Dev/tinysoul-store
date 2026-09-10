@@ -10,7 +10,7 @@ export default async function ProductsPage() {
   const products = await fetchProducts();
 
   return (
-    <main>
+    <main className="pt-24 md:pt-28">
       <div className="container mx-auto px-4 py-8">
         <div className="mb-8">
           <h1 className="text-3xl md:text-4xl font-bold text-teal-700 tracking-tight">

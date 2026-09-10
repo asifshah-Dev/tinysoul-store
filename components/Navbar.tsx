@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Menu, X, Search, User, ShoppingBag, ChevronDown } from 'lucide-react';
+import { Menu, X, Search, User, ShoppingBag } from 'lucide-react';
 import { motion, AnimatePresence, Variants } from 'framer-motion';
 import { useCart } from '@/context/CartContext';
 
@@ -12,8 +12,7 @@ export default function Navbar() {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const { cartCount } = useCart();
-  const [openDropdown, setOpenDropdown] = useState<string | null>(null);
-  
+
   const searchInputRef = useRef<HTMLInputElement>(null);
   const searchContainerRef = useRef<HTMLDivElement>(null);
   const menuButtonRef = useRef<HTMLButtonElement>(null);
@@ -26,14 +25,9 @@ export default function Navbar() {
   }, [isSearchOpen]);
 
   useEffect(() => {
-    if (isMenuOpen) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = 'unset';
-    }
-    return () => {
-      document.body.style.overflow = 'unset';
-    };
+    if (isMenuOpen) document.body.style.overflow = 'hidden';
+    else document.body.style.overflow = 'unset';
+    return () => { document.body.style.overflow = 'unset'; };
   }, [isMenuOpen]);
 
   useEffect(() => {
@@ -49,28 +43,19 @@ export default function Navbar() {
         setSearchQuery('');
       }
     };
-
     document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
+    return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [isSearchOpen]);
 
   useEffect(() => {
     const handleEscape = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
         if (isMenuOpen) setIsMenuOpen(false);
-        if (isSearchOpen) {
-          setIsSearchOpen(false);
-          setSearchQuery('');
-        }
+        if (isSearchOpen) { setIsSearchOpen(false); setSearchQuery(''); }
       }
     };
-
     document.addEventListener('keydown', handleEscape);
-    return () => {
-      document.removeEventListener('keydown', handleEscape);
-    };
+    return () => document.removeEventListener('keydown', handleEscape);
   }, [isMenuOpen, isSearchOpen]);
 
   const handleSearch = (e: React.FormEvent) => {
@@ -83,220 +68,119 @@ export default function Navbar() {
   };
 
   const menuVariants: Variants = {
-    hidden: {
-      opacity: 0,
-      x: -80,
-      transition: {
-        duration: 0.3,
-        ease: "easeInOut"
-      }
-    },
-    visible: {
-      opacity: 1,
-      x: 0,
-      transition: {
-        duration: 0.4,
-        ease: "easeInOut"
-      }
-    },
-    exit: {
-      opacity: 0,
-      x: -80,
-      transition: {
-        duration: 0.3,
-        ease: "easeInOut"
-      }
-    }
+    hidden: { opacity: 0, x: -80 },
+    visible: { opacity: 1, x: 0, transition: { duration: 0.4, ease: 'easeInOut' } },
+    exit: { opacity: 0, x: -80, transition: { duration: 0.3, ease: 'easeInOut' } },
   };
-
   const backdropVariants: Variants = {
-    hidden: {
-      opacity: 0,
-      transition: {
-        duration: 0.3,
-        ease: "easeInOut"
-      }
-    },
-    visible: {
-      opacity: 1,
-      transition: {
-        duration: 0.4,
-        ease: "easeInOut"
-      }
-    },
-    exit: {
-      opacity: 0,
-      transition: {
-        duration: 0.3,
-        ease: "easeInOut"
-      }
-    }
+    hidden: { opacity: 0 },
+    visible: { opacity: 1 },
+    exit: { opacity: 0 },
   };
-
   const searchVariants: Variants = {
-    hidden: {
-      opacity: 0,
-      y: -30,
-      scale: 0.95,
-      transition: {
-        duration: 0.25,
-        ease: "easeInOut"
-      }
-    },
-    visible: {
-      opacity: 1,
-      y: 0,
-      scale: 1,
-      transition: {
-        duration: 0.35,
-        ease: "easeInOut"
-      }
-    },
-    exit: {
-      opacity: 0,
-      y: -30,
-      scale: 0.95,
-      transition: {
-        duration: 0.25,
-        ease: "easeInOut"
-      }
-    }
+    hidden: { opacity: 0, y: -30, scale: 0.95 },
+    visible: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.35 } },
+    exit: { opacity: 0, y: -30, scale: 0.95, transition: { duration: 0.25 } },
   };
-
   const menuItemVariants: Variants = {
-    hidden: {
-      opacity: 0,
-      x: -20,
-      transition: {
-        duration: 0.2,
-        ease: "easeInOut"
-      }
-    },
+    hidden: { opacity: 0, x: -20 },
     visible: (i: number) => ({
-      opacity: 1,
-      x: 0,
-      transition: {
-        delay: i * 0.08,
-        duration: 0.3,
-        ease: "easeInOut"
-      }
+      opacity: 1, x: 0,
+      transition: { delay: i * 0.06, duration: 0.3 },
     }),
     exit: (i: number) => ({
-      opacity: 0,
-      x: -20,
-      transition: {
-        delay: i * 0.05,
-        duration: 0.2,
-        ease: "easeInOut"
-      }
-    })
+      opacity: 0, x: -20,
+      transition: { delay: i * 0.04, duration: 0.2 },
+    }),
   };
 
   const menuItems = [
-    { href: '/', label: 'Home' },
-    { href: '/products/new-arrivals', label: 'New Arrivals' },
-    { href: '/products/best-sellers', label: 'Best Sellers' },
-    { href: '/products/sale', label: 'Sale' },
-    { href: '/products', label: 'All Products' },
-    { href: '/about', label: 'About Us' },
-    { href: '/contact', label: 'Contact' },
+    { href: '/', label: 'Home', color: '#F4713A' },
+    { href: '/contact', label: 'Contact', color: '#9B59B6' },
+    { href: '/cart', label: 'Add to cart', color: '#FF6B9D' },
+    { href: '/products/new-arrivals', label: 'New arrivals', color: '#7CB342' },
+    { href: '/products/summer', label: 'Summer', color: '#FFC93C' },
+    { href: '/products/winter', label: 'Winter', color: '#29ABE2' },
+    { href: '/products/sale', label: 'Sale', color: '#F4713A' },
+    { href: '/products/girls-summer', label: 'Girls summer', color: '#FF6B9D' },
+    { href: '/products/boys-winter', label: 'Boys winter', color: '#29ABE2' },
   ];
 
   return (
     <>
-      <header className="sticky top-0 z-50 bg-white border-b border-teal-200/50 shadow-sm">
-        <div className="container mx-auto px-4">
-          <div className="flex items-center justify-between h-16 md:h-20">
-            
-            {/* LEFT: Menu + Search Icons */}
+      {/* ============ HEADER — fixed, subtle frosted glass, blends with hero ============ */}
+      <header className="fixed top-0 left-0 right-0 z-50 px-4 pt-4 bg-white/20 backdrop-blur-md border-b border-white/30">
+        <div className="container mx-auto max-w-7xl">
+          <div className="flex items-center justify-between h-16 md:h-20 px-4 md:px-6">
+
+            {/* LEFT: Menu + Search */}
             <div className="flex items-center gap-1 md:gap-2">
               <button
                 ref={menuButtonRef}
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
-                className="p-2 rounded-lg hover:bg-teal-50 transition-colors"
+                className="p-2 rounded-full text-[#2b2b2b] hover:bg-white/70 hover:text-[#F4713A] transition-all"
                 aria-label="Toggle menu"
               >
-                {isMenuOpen ? (
-                  <motion.div
-                    initial={{ rotate: -90, opacity: 0 }}
-                    animate={{ rotate: 0, opacity: 1 }}
-                    transition={{ duration: 0.3, ease: "easeInOut" }}
-                  >
-                    <X className="w-7 h-7 md:w-8 md:h-8 text-teal-700" />
-                  </motion.div>
-                ) : (
-                  <motion.div
-                    initial={{ rotate: 90, opacity: 0 }}
-                    animate={{ rotate: 0, opacity: 1 }}
-                    transition={{ duration: 0.3, ease: "easeInOut" }}
-                  >
-                    <Menu className="w-7 h-7 md:w-8 md:h-8 text-teal-700" />
-                  </motion.div>
-                )}
+                {isMenuOpen ? <X className="w-6 h-6 md:w-7 md:h-7" /> : <Menu className="w-6 h-6 md:w-7 md:h-7" />}
               </button>
 
               <button
                 ref={searchButtonRef}
                 onClick={() => setIsSearchOpen(!isSearchOpen)}
-                className="p-2 rounded-lg hover:bg-teal-50 transition-colors"
+                className="p-2 rounded-full text-[#2b2b2b] hover:bg-white/70 hover:text-[#29ABE2] transition-all"
                 aria-label="Search"
               >
-                <Search className="w-7 h-7 md:w-8 md:h-8 text-teal-700" />
+                <Search className="w-6 h-6 md:w-7 md:h-7" />
               </button>
             </div>
 
             {/* CENTER: Logo */}
-            <Link 
-              href="/" 
-              className="absolute left-1/2 -translate-x-1/2"
-            >
+            <Link href="/" className="absolute left-1/2 -translate-x-1/2">
               <Image
                 src="/logo.png"
                 alt="Tiny Soul"
-                width={180}
-                height={55}
-                className="h-11 md:h-14 w-auto object-contain"
+                width={360}
+                height={110}
+                className="h-16 md:h-24 w-auto object-contain"
                 priority
               />
             </Link>
 
-            {/* RIGHT: Account + Cart - CHECKOUT LINK */}
+            {/* RIGHT: Account + Cart */}
             <div className="flex items-center gap-1 md:gap-2">
               <Link
                 href="/login"
-                className="p-2 rounded-lg hover:bg-teal-50 transition-colors"
+                className="p-2 rounded-full text-[#2b2b2b] hover:bg-white/70 hover:text-[#7CB342] transition-all"
                 aria-label="Account"
               >
-                <User className="w-7 h-7 md:w-8 md:h-8 text-teal-700" />
+                <User className="w-6 h-6 md:w-7 md:h-7" />
               </Link>
 
               <Link
                 href="/checkout"
-                className="relative p-2 rounded-lg hover:bg-teal-50 transition-colors"
+                className="relative p-2 rounded-full text-[#2b2b2b] hover:bg-white/70 hover:text-[#FF6B9D] transition-all"
                 aria-label="Cart"
               >
-                <ShoppingBag className="w-7 h-7 md:w-8 md:h-8 text-teal-700" />
+                <ShoppingBag className="w-6 h-6 md:w-7 md:h-7" />
                 {cartCount > 0 && (
                   <motion.span
                     initial={{ scale: 0 }}
                     animate={{ scale: 1 }}
-                    transition={{ 
-                      type: "spring",
-                      stiffness: 400,
-                      damping: 15
-                    }}
-                    className="absolute -top-0.5 -right-0.5 bg-coral-500 text-white text-xs md:text-sm font-medium rounded-full w-6 h-6 md:w-7 md:h-7 flex items-center justify-center"
+                    transition={{ type: 'spring', stiffness: 400, damping: 15 }}
+                    className="absolute -top-0.5 -right-0.5 text-white text-xs font-bold rounded-full w-5 h-5 md:w-6 md:h-6 flex items-center justify-center"
+                    style={{ background: 'linear-gradient(135deg, #FF6B9D 0%, #F4713A 100%)' }}
                   >
                     {cartCount > 99 ? '99+' : cartCount}
                   </motion.span>
                 )}
               </Link>
             </div>
+
           </div>
         </div>
       </header>
 
-      {/* MOBILE MENU */}
+      {/* ============ MOBILE MENU ============ */}
       <AnimatePresence mode="wait">
         {isMenuOpen && (
           <>
@@ -305,39 +189,36 @@ export default function Navbar() {
               initial="hidden"
               animate="visible"
               exit="exit"
-              className="fixed inset-0 z-40 bg-black/50"
+              className="fixed inset-0 z-40 bg-black/20 backdrop-blur-sm"
               onClick={() => setIsMenuOpen(false)}
             />
-            
+
             <motion.div
               variants={menuVariants}
               initial="hidden"
               animate="visible"
               exit="exit"
-              className="fixed top-0 left-0 z-50 h-full w-80 md:w-96 bg-white shadow-2xl"
+              className="fixed top-0 left-0 z-50 h-full w-80 md:w-96
+                         bg-white/60 backdrop-blur-2xl
+                         border-r border-white/70"
             >
-              <div className="flex items-center justify-between p-4 md:p-6 border-b border-teal-200/50">
+              <div className="flex items-center justify-between p-4 md:p-6 border-b border-white/50">
                 <Image
                   src="/logo.png"
                   alt="Tiny Soul"
-                  width={140}
-                  height={40}
-                  className="h-8 w-auto object-contain"
+                  width={240}
+                  height={75}
+                  className="h-14 w-auto object-contain"
                 />
                 <button
                   onClick={() => setIsMenuOpen(false)}
-                  className="p-2 rounded-lg hover:bg-teal-50 transition-colors"
+                  className="p-2 rounded-full text-[#2b2b2b] hover:bg-white/70 transition-colors"
                 >
-                  <motion.div
-                    whileHover={{ rotate: 90 }}
-                    transition={{ duration: 0.3 }}
-                  >
-                    <X className="w-7 h-7 text-teal-700" />
-                  </motion.div>
+                  <X className="w-6 h-6" />
                 </button>
               </div>
-              
-              <nav className="p-4 md:p-6 overflow-y-auto h-[calc(100%-80px)]">
+
+              <nav className="p-4 md:p-6 overflow-y-auto h-[calc(100%-110px)]">
                 <ul className="space-y-2">
                   {menuItems.map((item, index) => (
                     <motion.li
@@ -350,10 +231,20 @@ export default function Navbar() {
                     >
                       <Link
                         href={item.href}
-                        className="block px-4 py-3 text-lg md:text-xl rounded-lg hover:bg-teal-50 transition-colors text-teal-700 font-medium"
+                        className="group flex items-center gap-3 px-4 py-3 text-base md:text-lg rounded-2xl
+                                   text-[#2b2b2b] font-bold
+                                   bg-white/40 hover:bg-white/90
+                                   border border-white/50 hover:border-white
+                                   transition-all"
                         onClick={() => setIsMenuOpen(false)}
                       >
-                        {item.label}
+                        <span
+                          className="w-2.5 h-2.5 rounded-full transition-transform group-hover:scale-125"
+                          style={{ backgroundColor: item.color }}
+                        />
+                        <span className="group-hover:text-[#F4713A] transition-colors">
+                          {item.label}
+                        </span>
                       </Link>
                     </motion.li>
                   ))}
@@ -364,7 +255,7 @@ export default function Navbar() {
         )}
       </AnimatePresence>
 
-      {/* SEARCH BAR */}
+      {/* ============ SEARCH BAR ============ */}
       <AnimatePresence mode="wait">
         {isSearchOpen && (
           <motion.div
@@ -373,41 +264,33 @@ export default function Navbar() {
             initial="hidden"
             animate="visible"
             exit="exit"
-            className="fixed top-0 left-0 right-0 z-50 bg-white shadow-lg"
+            className="fixed top-24 left-1/2 -translate-x-1/2 z-50 w-[92%] max-w-3xl"
           >
-            <div className="container mx-auto px-4 py-4 md:py-6">
+            <div className="bg-white/55 backdrop-blur-2xl rounded-full px-4 py-2">
               <form onSubmit={handleSearch} className="flex items-center gap-3">
-                <motion.button
+                <button
                   type="submit"
-                  whileHover={{ scale: 1.1 }}
-                  whileTap={{ scale: 0.9 }}
-                  className="p-2 text-teal-400 hover:text-teal-700 transition-colors"
+                  className="p-2 text-[#2b2b2b] hover:text-[#29ABE2] transition-colors"
+                  aria-label="Submit search"
                 >
-                  <Search className="w-7 h-7" />
-                </motion.button>
-                <motion.input
+                  <Search className="w-6 h-6" />
+                </button>
+                <input
                   ref={searchInputRef}
                   type="text"
                   placeholder="Search for products..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  initial={{ opacity: 0, x: -10 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.1, duration: 0.3 }}
-                  className="flex-1 py-3 text-lg md:text-xl text-gray-700 placeholder:text-teal-300 outline-none bg-transparent"
+                  className="flex-1 py-2 text-lg bg-transparent text-[#2b2b2b] placeholder:text-[#6f6248]/60 outline-none"
                 />
-                <motion.button
+                <button
                   type="button"
-                  onClick={() => {
-                    setIsSearchOpen(false);
-                    setSearchQuery('');
-                  }}
-                  whileHover={{ rotate: 90, scale: 1.1 }}
-                  transition={{ duration: 0.3 }}
-                  className="p-2 text-teal-400 hover:text-teal-700 transition-colors"
+                  onClick={() => { setIsSearchOpen(false); setSearchQuery(''); }}
+                  className="p-2 text-[#2b2b2b] hover:text-[#F4713A] transition-colors"
+                  aria-label="Close search"
                 >
-                  <X className="w-7 h-7" />
-                </motion.button>
+                  <X className="w-6 h-6" />
+                </button>
               </form>
             </div>
           </motion.div>

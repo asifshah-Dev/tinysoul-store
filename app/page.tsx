@@ -20,7 +20,47 @@ export default async function Home() {
   }));
 
   return (
-    <main className="bg-zinc-50">
+    <main className="relative min-h-screen">
+
+      {/* ============================================================
+          AMBIENT LOGO-COLOR BLOBS — FIXED, stays in viewport
+          ============================================================ */}
+      <div
+        aria-hidden
+        className="pointer-events-none fixed inset-0 overflow-hidden bg-cream-50 -z-10"
+      >
+        {/* Sun yellow — top-left */}
+        <div
+          className="absolute -top-32 -left-32 h-[520px] w-[520px] rounded-full blur-[120px] opacity-55"
+          style={{ background: 'radial-gradient(circle, #FFC93C 0%, transparent 70%)' }}
+        />
+        {/* Coral orange — top-right */}
+        <div
+          className="absolute top-10 right-1/4 h-[420px] w-[420px] rounded-full blur-[110px] opacity-45"
+          style={{ background: 'radial-gradient(circle, #F4713A 0%, transparent 70%)' }}
+        />
+        {/* Bubblegum pink — middle-right */}
+        <div
+          className="absolute top-1/3 -right-32 h-[520px] w-[520px] rounded-full blur-[120px] opacity-50"
+          style={{ background: 'radial-gradient(circle, #FF6B9D 0%, transparent 70%)' }}
+        />
+        {/* Sky blue — middle-left */}
+        <div
+          className="absolute top-1/2 -left-32 h-[520px] w-[520px] rounded-full blur-[120px] opacity-45"
+          style={{ background: 'radial-gradient(circle, #29ABE2 0%, transparent 70%)' }}
+        />
+        {/* Grass green — bottom-center */}
+        <div
+          className="absolute bottom-10 left-1/3 h-[420px] w-[420px] rounded-full blur-[120px] opacity-40"
+          style={{ background: 'radial-gradient(circle, #7CB342 0%, transparent 70%)' }}
+        />
+        {/* Grape purple — bottom-right */}
+        <div
+          className="absolute bottom-0 right-1/4 h-[420px] w-[420px] rounded-full blur-[120px] opacity-40"
+          style={{ background: 'radial-gradient(circle, #9B59B6 0%, transparent 70%)' }}
+        />
+      </div>
+
       {/* Hero Section */}
       <Hero slides={heroSlides} autoPlay={true} interval={5000} />
 
@@ -28,27 +68,27 @@ export default async function Home() {
       <section className="container mx-auto px-4 py-16">
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h2 className="text-2xl md:text-3xl font-bold text-zinc-900 tracking-tight">
+            <h2 className="text-2xl md:text-3xl font-bold text-cream-900 tracking-tight">
               Featured Products
             </h2>
-            <p className="text-zinc-500 text-sm mt-1">
+            <p className="text-cream-700 text-sm mt-1">
               Premium kids wear from TinySoul Pakistan
             </p>
           </div>
           <Link
             href="/product"
-            className="text-sm font-medium text-zinc-600 hover:text-zinc-900 transition-colors duration-300 flex items-center gap-1"
+            className="text-sm font-medium text-cream-700 hover:text-[#F4713A] transition-colors duration-300 flex items-center gap-1"
           >
             View All
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
             </svg>
           </Link>
         </div>
 
-        {/* Products with Filtering - Same as Products page */}
         <ProductsClient initialProducts={products} isFeatured={true} />
       </section>
     </main>
   );
-}"// force rebuild" 
+}
+// force rebuild

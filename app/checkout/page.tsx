@@ -129,7 +129,7 @@ export default function CheckoutPage() {
 
   if (cart.length === 0 && !orderPlaced) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center px-4">
+      <div className="min-h-screen flex flex-col items-center justify-center px-4 pt-24 md:pt-28">
         <ShoppingBag className="w-20 h-20 text-gray-300 mb-4" />
         <h2 className="text-2xl font-bold text-gray-800">Your cart is empty</h2>
         <p className="text-gray-500 mt-2">Looks like you haven't added any items yet.</p>
@@ -147,7 +147,7 @@ export default function CheckoutPage() {
   const country = countryCodes.find(c => c.code === selectedCountryCode);
 
   return (
-    <div className="min-h-screen py-8">
+    <div className="min-h-screen pt-24 md:pt-28 py-8">
       <div className="container mx-auto px-4">
         <h1 className="text-3xl font-bold text-gray-900 mb-8">Checkout</h1>
 

@@ -66,7 +66,7 @@ export default function ProductClientPage({ handle }: ProductClientProps) {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center pt-24 md:pt-28">
         <div className="text-gray-500">Loading...</div>
       </div>
     );
@@ -86,7 +86,7 @@ export default function ProductClientPage({ handle }: ProductClientProps) {
   const totalPrice = parseFloat(price) * quantity;
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen pt-24 md:pt-28">
       <div className="container mx-auto px-4 py-8">
         <nav className="text-sm text-gray-500 mb-6">
           <Link href="/" className="hover:text-teal-600 transition-colors">Home</Link>
@@ -191,17 +191,17 @@ export default function ProductClientPage({ handle }: ProductClientProps) {
                 </div>
               )}
               <button
-                onClick={handleAddToCart}
-                disabled={!inStock || isAdding}
-                className={`w-full py-4 rounded-xl font-semibold text-lg text-white transition-all flex items-center justify-center gap-2 ${
-                  inStock && !isAdding
-                    ? 'bg-teal-600 hover:bg-teal-700 shadow-lg' 
-                    : 'bg-gray-300 cursor-not-allowed'
-                }`}
-              >
-                <ShoppingBag className="w-5 h-5" />
-                {isAdding ? 'Adding...' : inStock ? 'Add to Cart' : 'Out of Stock'}
-              </button>
+  onClick={handleAddToCart}
+  disabled={!inStock || isAdding}
+  className={`w-full py-4 rounded-xl font-semibold text-lg text-white transition-all flex items-center justify-center gap-2 ${
+    inStock && !isAdding
+      ? 'bg-black hover:bg-gray-800 shadow-lg' 
+      : 'bg-gray-300 cursor-not-allowed'
+  }`}
+>
+  <ShoppingBag className="w-5 h-5" />
+  {isAdding ? 'Adding...' : inStock ? 'Add to Cart' : 'Out of Stock'}
+</button>
               
               <p className="text-sm text-gray-400 text-center mt-3">
                 Free shipping on orders over Rs 5000

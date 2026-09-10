@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Menu, X, Search, User, ShoppingBag } from 'lucide-react';
+import { Menu, X, Search, ShoppingBag, CreditCard } from 'lucide-react';
 import { motion, AnimatePresence, Variants } from 'framer-motion';
 import { useCart } from '@/context/CartContext';
 
@@ -96,19 +96,19 @@ export default function Navbar() {
 
   const menuItems = [
     { href: '/', label: 'Home', color: '#F4713A' },
-    { href: '/contact', label: 'Contact', color: '#9B59B6' },
-    { href: '/cart', label: 'Add to cart', color: '#FF6B9D' },
+    { href: '/cart', label: 'Cart', color: '#FF6B9D' },
     { href: '/products/new-arrivals', label: 'New arrivals', color: '#7CB342' },
     { href: '/products/summer', label: 'Summer', color: '#FFC93C' },
     { href: '/products/winter', label: 'Winter', color: '#29ABE2' },
     { href: '/products/sale', label: 'Sale', color: '#F4713A' },
     { href: '/products/girls-summer', label: 'Girls summer', color: '#FF6B9D' },
     { href: '/products/boys-winter', label: 'Boys winter', color: '#29ABE2' },
+    { href: '/contact', label: 'Contact', color: '#9B59B6' },
   ];
 
   return (
     <>
-      {/* ============ HEADER — fixed, subtle frosted glass, blends with hero ============ */}
+      {/* ============ HEADER — fixed, subtle frosted glass ============ */}
       <header className="fixed top-0 left-0 right-0 z-50 px-4 pt-4 bg-white/20 backdrop-blur-md border-b border-white/30">
         <div className="container mx-auto max-w-7xl">
           <div className="flex items-center justify-between h-16 md:h-20 px-4 md:px-6">
@@ -136,28 +136,21 @@ export default function Navbar() {
 
             {/* CENTER: Logo */}
             <Link href="/" className="absolute left-1/2 -translate-x-1/2">
-              <Image
-                src="/logo.png"
-                alt="Tiny Soul"
-                width={360}
-                height={110}
-                className="h-16 md:h-24 w-auto object-contain"
-                priority
-              />
+             <Image
+  src="/logo.png"
+  alt="Tiny Soul"
+  width={500}
+  height={150}
+  className="h-20 md:h-32 w-auto object-contain"
+  priority
+/>
             </Link>
 
-            {/* RIGHT: Account + Cart */}
+            {/* RIGHT: Cart + Checkout icons */}
             <div className="flex items-center gap-1 md:gap-2">
+              {/* Cart icon → /cart */}
               <Link
-                href="/login"
-                className="p-2 rounded-full text-[#2b2b2b] hover:bg-white/70 hover:text-[#7CB342] transition-all"
-                aria-label="Account"
-              >
-                <User className="w-6 h-6 md:w-7 md:h-7" />
-              </Link>
-
-              <Link
-                href="/checkout"
+                href="/cart"
                 className="relative p-2 rounded-full text-[#2b2b2b] hover:bg-white/70 hover:text-[#FF6B9D] transition-all"
                 aria-label="Cart"
               >
@@ -173,6 +166,15 @@ export default function Navbar() {
                     {cartCount > 99 ? '99+' : cartCount}
                   </motion.span>
                 )}
+              </Link>
+
+              {/* Checkout icon → /checkout */}
+              <Link
+                href="/checkout"
+                className="p-2 rounded-full text-[#2b2b2b] hover:bg-white/70 hover:text-[#7CB342] transition-all"
+                aria-label="Checkout"
+              >
+                <CreditCard className="w-6 h-6 md:w-7 md:h-7" />
               </Link>
             </div>
 

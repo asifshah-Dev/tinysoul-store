@@ -2,7 +2,7 @@
 
 import { useState, useMemo, useRef, useEffect } from 'react';
 import { ChevronDown, Check, X, Filter, SlidersHorizontal, LayoutGrid, Grid3x3, List } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, Variants } from 'framer-motion';
 import ProductCard from './ProductCard';
 
 interface Product {
@@ -217,7 +217,7 @@ export default function ProductsClient({ initialProducts, isFeatured = false }: 
     return option ? option.label : 'Sort';
   };
 
-  const containerVariants = {
+  const containerVariants: Variants = {
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
@@ -228,7 +228,7 @@ export default function ProductsClient({ initialProducts, isFeatured = false }: 
     },
   };
 
-  const itemVariants = {
+  const itemVariants: Variants = {
     hidden: {
       opacity: 0,
       y: 30,

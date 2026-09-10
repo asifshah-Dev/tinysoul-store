@@ -115,12 +115,12 @@ export default function CartDrawer() {
                       >
                         {item.title}
                       </Link>
-                      {item.selectedOptions && item.selectedOptions?.length > 0 && (
+                      {item.selectedOptions && (item.selectedOptions || []).length > 0 && (
                         <div className="text-xs text-gray-500 mt-1">
-                          {item.selectedOptions.map((opt, i) => (
+                          {(item.selectedOptions || []).map((opt, i) => (
                             <span key={i}>
                               {opt.name}: {opt.value}
-                              {i < item.selectedOptions.length - 1 && ', '}
+                              {i < (item.selectedOptions || []).length - 1 && ', '}
                             </span>
                           ))}
                         </div>

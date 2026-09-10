@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Menu, X, Search, User, ShoppingBag, ChevronDown } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, Variants } from 'framer-motion';
 import { useCart } from '@/context/CartContext';
 
 export default function Navbar() {
@@ -82,7 +82,7 @@ export default function Navbar() {
     }
   };
 
-  const menuVariants = {
+  const menuVariants: Variants = {
     hidden: {
       opacity: 0,
       x: -80,
@@ -109,7 +109,7 @@ export default function Navbar() {
     }
   };
 
-  const backdropVariants = {
+  const backdropVariants: Variants = {
     hidden: {
       opacity: 0,
       transition: {
@@ -133,7 +133,7 @@ export default function Navbar() {
     }
   };
 
-  const searchVariants = {
+  const searchVariants: Variants = {
     hidden: {
       opacity: 0,
       y: -30,
@@ -163,7 +163,7 @@ export default function Navbar() {
     }
   };
 
-  const menuItemVariants = {
+  const menuItemVariants: Variants = {
     hidden: {
       opacity: 0,
       x: -20,

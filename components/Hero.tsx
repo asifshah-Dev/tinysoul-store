@@ -1,11 +1,14 @@
 // components/Hero.tsx
 'use client';
 
-import { useState, useEffect } from 'react';
-import Image from 'next/image';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import Link from 'next/link';
-import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
-import { ChevronLeft, ChevronRight, Sparkle } from 'lucide-react';
+import {
+  motion,
+  AnimatePresence,
+  useReducedMotion,
+} from 'framer-motion';
+import { ChevronLeft, ChevronRight, ArrowRight, Sparkles } from 'lucide-react';
 
 interface HeroSlide {
   id: string;
@@ -23,13 +26,168 @@ interface HeroProps {
   interval?: number;
 }
 
-const EASE = [0.16, 1, 0.3, 1] as const;
+function BgRemovedImage({
+  src,
+  alt,
+  width,
+  height,
+  className,
+  tolerance = 245,
+}: {
+  src: string;
+  alt: string;
+  width: number;
+  height: number;
+  className?: string;
+  tolerance?: number;
+}) {
+  const [processedSrc, setProcessedSrc] = useState<string>(src);
+  const [isProcessing, setIsProcessing] = useState(true);
 
-export default function Hero({ slides = [], autoPlay = true, interval = 5000 }: HeroProps) {
+  useEffect(() => {
+    let isMounted = true;
+    const img = new Image();
+    if (src.startsWith('http')) img.crossOrigin = 'anonymous';
+
+    img.onload = () => {
+      if (!isMounted) return;
+      try {
+        const canvas = document.createElement('canvas');
+        const w = img.naturalWidth || width;
+        const h = img.naturalHeight || height;
+        canvas.width = w;
+        canvas.height = h;
+        const ctx = canvas.getContext('2d', { willReadFrequently: true });
+        if (!ctx) { setIsProcessing(false); return; }
+
+        ctx.drawImage(img, 0, 0, w, h);
+        const imageData = ctx.getImageData(0, 0, w, h);
+        const data = imageData.data;
+
+        for (let i = 0; i < data.length; i += 4) {
+          if (data[i] >= tolerance && data[i + 1] >= tolerance && data[i + 2] >= tolerance) {
+            data[i + 3] = 0;
+          }
+        }
+        ctx.putImageData(imageData, 0, 0);
+        if (isMounted) {
+          setProcessedSrc(canvas.toDataURL('image/png'));
+          setIsProcessing(false);
+        }
+      } catch {
+        if (isMounted) { setProcessedSrc(src); setIsProcessing(false); }
+      }
+    };
+    img.onerror = () => { if (isMounted) { setProcessedSrc(src); setIsProcessing(false); } };
+    img.src = src;
+    return () => { isMounted = false; };
+  }, [src, width, height, tolerance]);
+
+  return (
+    <div className={`${className} relative flex items-center justify-center`}>
+      {isProcessing && (
+        <div className="absolute inset-0 flex items-center justify-center z-20">
+          <div className="w-8 h-8 border-[3px] border-[#F4713A]/30 border-t-[#F4713A] rounded-full animate-spin" />
+        </div>
+      )}
+      <img
+        src={processedSrc}
+        alt={alt}
+        width={width}
+        height={height}
+        className={`w-auto h-[75%] object-contain transition-opacity duration-300 ${isProcessing ? 'opacity-0' : 'opacity-100'}`}
+        style={{ filter: 'drop-shadow(0 30px 60px rgba(43,43,43,0.2))' }}
+      />
+    </div>
+  );
+}
+
+const EASE = [0.16, 1, 0.3, 1] as const;
+const EASE_OUT = [0.22, 1, 0.36, 1] as const;
+
+export default function Hero({ slides = [], autoPlay = true, interval = 5500 }: HeroProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isHovering, setIsHovering] = useState(false);
   const [direction, setDirection] = useState<1 | -1>(1);
   const prefersReducedMotion = useReducedMotion();
+
+  // ============================================================
+  // ROLLER SCROLL — Direct DOM writes, rAF throttled, no React state
+  // Wrapper holds the perspective. Section rotates on bottom edge.
+  // ============================================================
+  const wrapperRef = useRef<HTMLDivElement>(null);
+  const sectionRef = useRef<HTMLDivElement>(null);
+  const contentRef = useRef<HTMLDivElement>(null);
+  const imageRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (prefersReducedMotion) return;
+
+    let ticking = false;
+    let lastProgress = -1;
+
+    const update = () => {
+      const wrapper = wrapperRef.current;
+      const section = sectionRef.current;
+      const content = contentRef.current;
+      const image = imageRef.current;
+
+      if (!wrapper || !section) { ticking = false; return; }
+
+      const rect = wrapper.getBoundingClientRect();
+      const heroHeight = Math.max(1, rect.height);
+
+      // 0 at page top → 1 when the hero has scrolled a full hero-height past the top
+      const raw = Math.min(1, Math.max(0, -rect.top / heroHeight));
+
+      // Skip if nothing meaningfully changed
+      if (Math.abs(raw - lastProgress) < 0.0008) {
+        ticking = false;
+        return;
+      }
+      lastProgress = raw;
+
+      // ── Roller angles ──
+      // rotateX POSITIVE tilts the TOP edge away from viewer.
+      // With transformOrigin 'center bottom', the bottom stays put
+      // and the top arcs back — reads like the section is rolling
+      // away from the viewer on a hinge.
+      const rotateX = -18 * raw;        // negative → top tips AWAY
+      const liftY = -20 * raw;           // subtle lift
+      const scale = 1 - 0.045 * raw;     // shrinks to ~95.5%
+      const opacity = 1 - 0.55 * raw;    // fades to 45%
+
+      section.style.transform =
+        `rotateX(${rotateX}deg) translateY(${liftY}px) scale(${scale})`;
+      section.style.opacity = String(opacity);
+
+      // ── Inner parallax — text slower, image faster ──
+      if (content) {
+        content.style.transform = `translateY(${-40 * raw}px)`;
+      }
+      if (image) {
+        image.style.transform = `translateY(${-80 * raw}px)`;
+      }
+
+      ticking = false;
+    };
+
+    const onScroll = () => {
+      if (!ticking) {
+        ticking = true;
+        requestAnimationFrame(update);
+      }
+    };
+
+    update();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll, { passive: true });
+
+    return () => {
+      window.removeEventListener('scroll', onScroll);
+      window.removeEventListener('resize', onScroll);
+    };
+  }, [prefersReducedMotion]);
 
   useEffect(() => {
     if (!autoPlay || isHovering || slides.length === 0) return;
@@ -40,18 +198,20 @@ export default function Hero({ slides = [], autoPlay = true, interval = 5000 }: 
     return () => clearInterval(timer);
   }, [autoPlay, isHovering, interval, slides.length]);
 
-  const goToSlide = (index: number) => {
+  const goToSlide = useCallback((index: number) => {
     setDirection(index > currentIndex ? 1 : -1);
     setCurrentIndex(index);
-  };
-  const nextSlide = () => {
+  }, [currentIndex]);
+
+  const nextSlide = useCallback(() => {
     setDirection(1);
     setCurrentIndex((prev) => (prev + 1) % slides.length);
-  };
-  const prevSlide = () => {
+  }, [slides.length]);
+
+  const prevSlide = useCallback(() => {
     setDirection(-1);
     setCurrentIndex((prev) => (prev - 1 + slides.length) % slides.length);
-  };
+  }, [slides.length]);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -60,212 +220,425 @@ export default function Hero({ slides = [], autoPlay = true, interval = 5000 }: 
     };
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [slides.length]);
+  }, [prevSlide, nextSlide]);
 
   if (!slides || slides.length === 0) return null;
 
   const currentSlide = slides[currentIndex];
   const reduce = !!prefersReducedMotion;
 
+  const titleWords = (currentSlide.title || '').trim().split(' ');
+  const firstWord = titleWords.shift() || '';
+  const restOfTitle = titleWords.join(' ');
+  const headlineWords = (restOfTitle || currentSlide.title || '').trim().split(' ');
+
   const imageVariants = {
-    enter: (dir: 1 | -1) => ({ opacity: 0, x: reduce ? 0 : dir > 0 ? 40 : -40 }),
-    center: { opacity: 1, x: 0, transition: { duration: 0.9, ease: EASE } },
-    exit: (dir: 1 | -1) => ({ opacity: 0, x: reduce ? 0 : dir > 0 ? -40 : 40, transition: { duration: 0.5, ease: EASE } }),
+    enter: (dir: 1 | -1) => ({
+      opacity: 0,
+      scale: reduce ? 1 : 1.08,
+      rotate: reduce ? 0 : dir > 0 ? 3 : -3,
+      x: reduce ? 0 : dir > 0 ? 40 : -40,
+    }),
+    center: { opacity: 1, scale: 1, rotate: 0, x: 0, transition: { duration: 1.1, ease: EASE } },
+    exit: (dir: 1 | -1) => ({
+      opacity: 0,
+      scale: reduce ? 1 : 1.02,
+      rotate: reduce ? 0 : dir > 0 ? -2 : 2,
+      x: reduce ? 0 : dir > 0 ? -30 : 30,
+      transition: { duration: 0.5, ease: EASE },
+    }),
   };
 
   const contentContainer = {
     hidden: {},
-    show: { transition: { staggerChildren: reduce ? 0 : 0.09, delayChildren: 0.15 } },
+    show: { transition: { staggerChildren: reduce ? 0 : 0.08, delayChildren: reduce ? 0 : 0.15 } },
+    exit: { transition: { staggerChildren: reduce ? 0 : 0.03, staggerDirection: -1 } },
   };
 
   const contentItem = {
-    hidden: { opacity: 0, y: reduce ? 0 : 16 },
-    show: { opacity: 1, y: 0, transition: { duration: 0.8, ease: EASE } },
+    hidden: { opacity: 0, y: reduce ? 0 : 20 },
+    show: { opacity: 1, y: 0, transition: { duration: 0.8, ease: EASE_OUT } },
+    exit: { opacity: 0, y: reduce ? 0 : -10, transition: { duration: 0.25, ease: EASE_OUT } },
+  };
+
+  const wordVariant = {
+    hidden: {
+      opacity: 0,
+      y: reduce ? 0 : '0.6em',
+      filter: reduce ? 'blur(0px)' : 'blur(8px)',
+    },
+    show: { opacity: 1, y: 0, filter: 'blur(0px)', transition: { duration: 0.7, ease: EASE } },
+  };
+
+  const eyebrowLineVariant = {
+    hidden: { scaleX: 0 },
+    show: { scaleX: 1, transition: { duration: 0.7, ease: EASE, delay: 0.15 } },
+  };
+
+  const pillVariant = {
+    hidden: { opacity: 0, x: 20, scale: 0.9 },
+    show: { opacity: 1, x: 0, scale: 1, transition: { duration: 0.6, ease: EASE, delay: 0.7 } },
+  };
+
+  const labelVariant = {
+    hidden: { opacity: 0, x: -20, scale: 0.9 },
+    show: { opacity: 1, x: 0, scale: 1, transition: { duration: 0.6, ease: EASE, delay: 0.85 } },
   };
 
   return (
+    // OUTER WRAPPER — holds perspective, is the scroll measurement target
+    // This is a plain <div>, so refs hydrate reliably (no Framer wrapper issue)
     <div
-      className="relative w-full overflow-hidden bg-white"
-      onMouseEnter={() => setIsHovering(true)}
-      onMouseLeave={() => setIsHovering(false)}
+      ref={wrapperRef}
+      style={{
+        perspective: '1600px',
+        perspectiveOrigin: 'center bottom',
+      }}
     >
-      {/* ============================================================
-          AMBIENT LOGO-COLOR BLOBS
-          ============================================================ */}
-      <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
-        {/* Sun yellow — top-left */}
-        <motion.div
-          className="absolute -top-32 -left-32 h-[480px] w-[480px] rounded-full blur-[110px] opacity-60"
-          style={{ background: 'radial-gradient(circle, #FFC93C 0%, transparent 70%)' }}
-          animate={reduce ? undefined : { x: [0, 40, 0], y: [0, 30, 0] }}
-          transition={{ duration: 18, repeat: Infinity, ease: 'easeInOut' }}
-        />
+      {/* INNER SECTION — this is what rotates as you scroll */}
+      <div
+        ref={sectionRef}
+        style={{
+          transformOrigin: 'center bottom',
+          willChange: 'transform, opacity',
+          transformStyle: 'preserve-3d',
+        }}
+      >
+        <section
+          className="relative w-full overflow-hidden bg-[#FFFCF6]"
+          onMouseEnter={() => setIsHovering(true)}
+          onMouseLeave={() => setIsHovering(false)}
+        >
+          <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
+            <div
+              className="absolute inset-0"
+              style={{
+                background: 'linear-gradient(135deg, #FFFDF7 0%, #FFF6E5 40%, #FFE9DC 100%)',
+              }}
+            />
+            <div
+              className="absolute top-1/2 right-[8%] -translate-y-1/2 w-[700px] h-[700px] rounded-full opacity-70 hidden md:block"
+              style={{
+                background: 'radial-gradient(circle, rgba(255,201,60,0.35) 0%, rgba(255,107,157,0.2) 45%, transparent 75%)',
+                filter: 'blur(50px)',
+              }}
+            />
+            <div
+              className="absolute -bottom-40 -left-32 w-[500px] h-[500px] rounded-full opacity-40"
+              style={{
+                background: 'radial-gradient(circle, #6EC4EC 0%, transparent 70%)',
+                filter: 'blur(70px)',
+              }}
+            />
+          </div>
 
-        {/* Bubblegum pink — right, mid */}
-        <motion.div
-          className="absolute top-1/4 -right-32 h-[520px] w-[520px] rounded-full blur-[120px] opacity-55"
-          style={{ background: 'radial-gradient(circle, #FF6B9D 0%, transparent 70%)' }}
-          animate={reduce ? undefined : { x: [0, -40, 0], y: [0, 40, 0] }}
-          transition={{ duration: 22, repeat: Infinity, ease: 'easeInOut' }}
-        />
+          <div className="relative min-h-[560px] md:min-h-[640px] lg:min-h-[700px] flex items-center pt-28 pb-16 md:pt-32 md:pb-20">
+            <div className="container mx-auto px-6 md:px-12 relative z-10">
+              <div className="grid grid-cols-1 md:grid-cols-12 gap-10 md:gap-8 items-center">
 
-        {/* Sky blue — bottom-left */}
-        <motion.div
-          className="absolute -bottom-32 left-1/4 h-[500px] w-[500px] rounded-full blur-[120px] opacity-55"
-          style={{ background: 'radial-gradient(circle, #29ABE2 0%, transparent 70%)' }}
-          animate={reduce ? undefined : { x: [0, 30, 0], y: [0, -30, 0] }}
-          transition={{ duration: 20, repeat: Infinity, ease: 'easeInOut' }}
-        />
-
-        {/* Grass green — top-center-right */}
-        <motion.div
-          className="absolute top-12 right-1/3 h-[360px] w-[360px] rounded-full blur-[110px] opacity-45"
-          style={{ background: 'radial-gradient(circle, #7CB342 0%, transparent 70%)' }}
-          animate={reduce ? undefined : { x: [0, -25, 0], y: [0, 25, 0] }}
-          transition={{ duration: 24, repeat: Infinity, ease: 'easeInOut' }}
-        />
-
-        {/* Coral orange — top-right */}
-        <motion.div
-          className="absolute -top-20 right-1/4 h-[400px] w-[400px] rounded-full blur-[110px] opacity-50"
-          style={{ background: 'radial-gradient(circle, #F4713A 0%, transparent 70%)' }}
-          animate={reduce ? undefined : { x: [0, 25, 0], y: [0, -25, 0] }}
-          transition={{ duration: 21, repeat: Infinity, ease: 'easeInOut' }}
-        />
-
-        {/* Grape purple — bottom-right (subtle) */}
-        <motion.div
-          className="absolute bottom-0 right-1/4 h-[320px] w-[320px] rounded-full blur-[110px] opacity-35"
-          style={{ background: 'radial-gradient(circle, #9B59B6 0%, transparent 70%)' }}
-          animate={reduce ? undefined : { x: [0, -20, 0], y: [0, 20, 0] }}
-          transition={{ duration: 26, repeat: Infinity, ease: 'easeInOut' }}
-        />
-      </div>
-
-     <div className="relative min-h-[420px] md:min-h-[520px] lg:min-h-[560px] flex items-center pt-28 pb-10 md:pt-36 md:pb-14">
-        <div className="container mx-auto px-6 md:px-12 relative z-10">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 items-center">
-
-            {/* LEFT: Text */}
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={`text-${currentIndex}`}
-                variants={contentContainer}
-                initial="hidden"
-                animate="show"
-                exit={{ opacity: 0, transition: { duration: 0.25 } }}
-                className="order-2 md:order-1 text-center md:text-left"
-              >
-                {currentSlide.subtitle && (
-                  <motion.span
-                    variants={contentItem}
-                    className="inline-flex items-center gap-1.5 px-3 py-1 mb-4 text-xs font-bold text-bubble-600 bg-bubble-100 rounded-full"
-                  >
-                    <Sparkle className="w-3.5 h-3.5 fill-current" />
-                    {currentSlide.subtitle}
-                  </motion.span>
-                )}
-
-                <motion.h1
-                  variants={contentItem}
-                  className="text-3xl md:text-5xl lg:text-6xl font-extrabold leading-[1.08] tracking-tight text-cream-900"
+                {/* LEFT — Text column with parallax ref */}
+                <div
+                  ref={contentRef}
+                  className="md:col-span-5 order-2 md:order-1"
+                  style={{ willChange: 'transform' }}
                 >
-                  {currentSlide.title}
-                </motion.h1>
-
-                {currentSlide.description && (
-                  <motion.p
-                    variants={contentItem}
-                    className="mt-5 text-base md:text-lg text-cream-700 max-w-md mx-auto md:mx-0"
-                  >
-                    {currentSlide.description}
-                  </motion.p>
-                )}
-
-                {currentSlide.link && (
-                  <motion.div variants={contentItem} className="mt-8">
-                    <Link
-                      href={currentSlide.link}
-                      className="btn-play inline-block px-8 py-3.5 text-base"
+                  <AnimatePresence mode="wait">
+                    <motion.div
+                      key={`text-${currentIndex}`}
+                      variants={contentContainer}
+                      initial="hidden"
+                      animate="show"
+                      exit="exit"
+                      className="text-center md:text-left"
                     >
-                      {currentSlide.buttonText || 'Shop Now'}
-                    </Link>
-                  </motion.div>
-                )}
-              </motion.div>
-            </AnimatePresence>
+                      {firstWord && (
+                        <motion.div
+                          variants={contentItem}
+                          className="flex items-center gap-3 justify-center md:justify-start mb-6"
+                        >
+                          <Sparkles className="w-4 h-4 text-[#F4713A]" />
+                          <span className="text-[11px] font-black uppercase tracking-[0.3em] text-[#F4713A]">
+                            {firstWord}
+                          </span>
+                          <motion.span
+                            variants={eyebrowLineVariant}
+                            className="w-12 h-px bg-[#F4713A]/30 origin-left inline-block"
+                          />
+                        </motion.div>
+                      )}
 
-            {/* RIGHT: Image — mix-blend-multiply drops the white photo
-                background out against the blobs/page behind it. Darker
-                pixels of the product stay visible; only true white
-                (and near-white) areas disappear. */}
-            <AnimatePresence mode="wait" custom={direction}>
+                      <motion.h1
+                        variants={contentItem}
+                        className="text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-black leading-[1.02] tracking-[-0.02em] text-[#2b2b2b]"
+                      >
+                        <AnimatePresence mode="wait">
+                          <motion.span
+                            key={`headline-${currentIndex}`}
+                            className="inline-block"
+                            initial="hidden"
+                            animate="show"
+                            exit="hidden"
+                            variants={{
+                              hidden: {},
+                              show: {
+                                transition: {
+                                  staggerChildren: reduce ? 0 : 0.07,
+                                  delayChildren: reduce ? 0 : 0.15,
+                                },
+                              },
+                            }}
+                          >
+                            {headlineWords.map((word, i) => (
+                              <motion.span
+                                key={`${word}-${i}`}
+                                variants={wordVariant}
+                                className="inline-block mr-[0.25em]"
+                              >
+                                {word}
+                              </motion.span>
+                            ))}
+                          </motion.span>
+                        </AnimatePresence>
+                      </motion.h1>
+
+                      {currentSlide.description && (
+                        <motion.p
+                          variants={contentItem}
+                          className="mt-6 text-base md:text-lg text-[#6f6248] max-w-md mx-auto md:mx-0 leading-relaxed"
+                        >
+                          {currentSlide.description}
+                        </motion.p>
+                      )}
+
+                      {currentSlide.link && (
+                        <motion.div
+                          variants={contentItem}
+                          className="mt-10 flex flex-col sm:flex-row items-center gap-4 justify-center md:justify-start"
+                        >
+                          <motion.div
+                            whileHover={reduce ? {} : { scale: 1.03, y: -2 }}
+                            whileTap={reduce ? {} : { scale: 0.97 }}
+                            transition={{ type: 'spring', stiffness: 400, damping: 22 }}
+                          >
+                            <Link
+                              href={currentSlide.link}
+                              className="group relative inline-flex items-center gap-3 px-8 py-4 rounded-full overflow-hidden bg-[#2b2b2b] text-[#FFFCF6] font-bold text-sm md:text-base"
+                              style={{ boxShadow: '0 14px 32px -10px rgba(43,43,43,0.4)' }}
+                            >
+                              <span
+                                aria-hidden
+                                className="absolute inset-0 -translate-x-full group-hover:translate-x-0 transition-transform duration-500 ease-out"
+                                style={{ background: 'linear-gradient(135deg, #F4713A 0%, #FF6B9D 100%)' }}
+                              />
+                              <span className="relative z-10 flex items-center gap-3">
+                                {currentSlide.buttonText || 'Shop Now'}
+                                <ArrowRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" />
+                              </span>
+                            </Link>
+                          </motion.div>
+
+                          <Link
+                            href="/products"
+                            className="group inline-flex items-center gap-2 text-sm font-bold uppercase tracking-widest text-[#2b2b2b] hover:text-[#F4713A] transition-colors"
+                          >
+                            Browse All
+                            <span className="w-6 h-px bg-current transition-all duration-300 group-hover:w-10" />
+                          </Link>
+                        </motion.div>
+                      )}
+
+                      <motion.div
+                        variants={contentItem}
+                        className="mt-10 pt-8 border-t border-[#2b2b2b]/10 flex flex-wrap gap-x-8 gap-y-3 justify-center md:justify-start"
+                      >
+                        {[
+                          { color: '#7CB342', label: 'Free Shipping' },
+                          { color: '#FF6B9D', label: '500+ Parents' },
+                          { color: '#29ABE2', label: '4.9★ Rated' },
+                        ].map((tag, i) => (
+                          <motion.div
+                            key={tag.label}
+                            initial={{ opacity: 0, y: 8 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: reduce ? 0 : 0.9 + i * 0.08, duration: 0.5, ease: EASE }}
+                            className="flex items-center gap-2"
+                          >
+                            <motion.span
+                              initial={{ scale: 0 }}
+                              animate={{ scale: 1 }}
+                              transition={{ delay: reduce ? 0 : 0.9 + i * 0.08, duration: 0.4, ease: EASE }}
+                              className="w-1.5 h-1.5 rounded-full"
+                              style={{ backgroundColor: tag.color }}
+                            />
+                            <span className="text-xs font-bold uppercase tracking-wider text-[#6f6248]">
+                              {tag.label}
+                            </span>
+                          </motion.div>
+                        ))}
+                      </motion.div>
+                    </motion.div>
+                  </AnimatePresence>
+                </div>
+
+                {/* RIGHT — Image column with parallax ref */}
+                <div
+                  ref={imageRef}
+                  className="md:col-span-7 order-1 md:order-2 relative flex items-center justify-center"
+                  style={{ willChange: 'transform' }}
+                >
+                  <AnimatePresence mode="wait" custom={direction}>
+                    <motion.div
+                      key={`img-${currentIndex}`}
+                      custom={direction}
+                      variants={imageVariants}
+                      initial="enter"
+                      animate="center"
+                      exit="exit"
+                      className="relative w-full max-w-[520px] aspect-square flex items-center justify-center"
+                    >
+                      {currentSlide.image && (
+                        <BgRemovedImage
+                          src={currentSlide.image}
+                          alt={currentSlide.title}
+                          width={800}
+                          height={800}
+                          className="relative z-10"
+                          tolerance={245}
+                        />
+                      )}
+
+                      <motion.div
+                        variants={pillVariant}
+                        initial="hidden"
+                        animate="show"
+                        className="absolute top-[10%] right-[6%] z-20 flex items-center gap-2 px-4 py-2 rounded-full bg-white shadow-xl"
+                      >
+                        <span className="relative flex w-2 h-2">
+                          <span className="absolute inline-flex h-full w-full rounded-full bg-[#7CB342] opacity-75 animate-ping" />
+                          <span className="relative inline-flex rounded-full h-2 w-2 bg-[#7CB342]" />
+                        </span>
+                        <span className="text-[10px] font-black uppercase tracking-widest text-[#2b2b2b]">
+                          In Stock
+                        </span>
+                      </motion.div>
+
+                      <motion.div
+                        variants={labelVariant}
+                        initial="hidden"
+                        animate="show"
+                        className="absolute bottom-[12%] left-[6%] z-20"
+                      >
+                        <div className="px-3 py-1.5 rounded-lg bg-[#2b2b2b]/90 backdrop-blur-md">
+                          <span className="text-[10px] font-black uppercase tracking-widest text-white">
+                            Featured Drop
+                          </span>
+                        </div>
+                      </motion.div>
+                    </motion.div>
+                  </AnimatePresence>
+                </div>
+              </div>
+            </div>
+
+            {slides.length > 1 && (
               <motion.div
-                key={`img-${currentIndex}`}
-                custom={direction}
-                variants={imageVariants}
-                initial="enter"
-                animate="center"
-                exit="exit"
-                className="order-1 md:order-2 flex items-center justify-center relative"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: reduce ? 0 : 1.1, duration: 0.6, ease: EASE }}
+                className="absolute bottom-20 md:bottom-24 left-1/2 md:left-auto md:right-12 -translate-x-1/2 md:translate-x-0 z-30 flex items-center gap-4"
               >
-                {currentSlide.image && (
-                  <Image
-                    src={currentSlide.image}
-                    alt={currentSlide.title}
-                    width={600}
-                    height={600}
-                    className="w-auto h-[240px] md:h-[380px] lg:h-[440px] object-contain drop-shadow-xl mix-blend-multiply"
-                    priority
-                    unoptimized={currentSlide.image.includes('?v=')}
-                  />
-                )}
+                <motion.button
+                  onClick={prevSlide}
+                  aria-label="Previous slide"
+                  whileHover={reduce ? {} : { scale: 1.08, x: -2 }}
+                  whileTap={reduce ? {} : { scale: 0.92 }}
+                  transition={{ type: 'spring', stiffness: 400, damping: 22 }}
+                  className="flex items-center justify-center w-11 h-11 rounded-full border border-[#2b2b2b]/15 text-[#2b2b2b] bg-white/70 backdrop-blur-md hover:bg-[#2b2b2b] hover:text-white transition-colors duration-300"
+                >
+                  <ChevronLeft className="w-5 h-5" />
+                </motion.button>
+
+                <div className="flex items-center gap-2 px-3 py-2 rounded-full bg-white/70 backdrop-blur-md border border-[#2b2b2b]/10">
+                  {slides.map((_, index) => {
+                    const isActive = index === currentIndex;
+                    return (
+                      <button
+                        key={index}
+                        onClick={() => goToSlide(index)}
+                        aria-label={`Go to slide ${index + 1}`}
+                        className={`transition-all duration-500 ${
+                          isActive
+                            ? 'w-6 h-1.5 rounded-full bg-[#2b2b2b]'
+                            : 'w-1.5 h-1.5 rounded-full bg-[#2b2b2b]/25 hover:bg-[#2b2b2b]/50'
+                        }`}
+                      />
+                    );
+                  })}
+                </div>
+
+                <motion.button
+                  onClick={nextSlide}
+                  aria-label="Next slide"
+                  whileHover={reduce ? {} : { scale: 1.08, x: 2 }}
+                  whileTap={reduce ? {} : { scale: 0.92 }}
+                  transition={{ type: 'spring', stiffness: 400, damping: 22 }}
+                  className="flex items-center justify-center w-11 h-11 rounded-full bg-[#2b2b2b] text-white hover:bg-[#F4713A] transition-colors duration-300"
+                >
+                  <ChevronRight className="w-5 h-5" />
+                </motion.button>
               </motion.div>
-            </AnimatePresence>
+            )}
           </div>
-        </div>
 
-        {/* Arrows */}
-        {slides.length > 1 && (
-          <>
-            <button
-              onClick={prevSlide}
-              aria-label="Previous slide"
-              className="absolute left-3 md:left-5 top-1/2 -translate-y-1/2 z-20 p-2 rounded-full bg-white text-cream-900 border border-cream-200 hover:border-play-500 hover:text-play-600 transition-colors"
-            >
-              <ChevronLeft className="w-5 h-5" />
-            </button>
-            <button
-              onClick={nextSlide}
-              aria-label="Next slide"
-              className="absolute right-3 md:right-5 top-1/2 -translate-y-1/2 z-20 p-2 rounded-full bg-white text-cream-900 border border-cream-200 hover:border-play-500 hover:text-play-600 transition-colors"
-            >
-              <ChevronRight className="w-5 h-5" />
-            </button>
-          </>
-        )}
-
-        {/* Dots */}
-        {slides.length > 1 && (
-          <div className="absolute bottom-5 left-1/2 -translate-x-1/2 z-20 flex items-center gap-2">
-            {slides.map((_, index) => {
-              const isActive = index === currentIndex;
-              return (
-                <button
-                  key={index}
-                  onClick={() => goToSlide(index)}
-                  aria-label={`Go to slide ${index + 1}`}
-                  className={`rounded-full transition-all duration-500 ${
-                    isActive
-                      ? 'w-8 h-2 bg-play-500'
-                      : 'w-2 h-2 bg-cream-900/20 hover:bg-cream-900/40'
-                  }`}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: reduce ? 0 : 1.2, duration: 0.7, ease: EASE }}
+            className="relative z-20 w-full pb-8 md:pb-10"
+          >
+            <div className="container mx-auto px-6 md:px-12">
+              <div className="relative rounded-full bg-[#2b2b2b] overflow-hidden py-4">
+                <div
+                  aria-hidden
+                  className="absolute left-0 top-0 bottom-0 w-16 z-10 pointer-events-none"
+                  style={{ background: 'linear-gradient(90deg, #2b2b2b 0%, transparent 100%)' }}
                 />
-              );
-            })}
-          </div>
-        )}
+                <div
+                  aria-hidden
+                  className="absolute right-0 top-0 bottom-0 w-16 z-10 pointer-events-none"
+                  style={{ background: 'linear-gradient(270deg, #2b2b2b 0%, transparent 100%)' }}
+                />
+
+                <div className="marquee-track">
+                  <div className="marquee-content">
+                    {[...Array(2)].map((_, dupIdx) => (
+                      <div key={dupIdx} className="flex items-center gap-6 px-3 shrink-0">
+                        {[
+                          { label: 'Free Shipping Rs 5,000+', dot: '#7CB342' },
+                          { label: 'New Arrivals Weekly', dot: '#FF6B9D' },
+                          { label: '500+ Happy Parents', dot: '#FFC93C' },
+                          { label: 'Sale Up To 50% Off', dot: '#29ABE2' },
+                          { label: 'Made for Little Souls', dot: '#9B59B6' },
+                          { label: 'Easy Returns', dot: '#F4713A' },
+                        ].map((item, i) => (
+                          <div key={`${dupIdx}-${i}`} className="flex items-center gap-6">
+                            <span className="text-[11px] md:text-xs font-black uppercase tracking-[0.25em] text-white/95 whitespace-nowrap">
+                              {item.label}
+                            </span>
+                            <span
+                              className="w-1.5 h-1.5 rounded-full shrink-0"
+                              style={{ backgroundColor: item.dot }}
+                            />
+                          </div>
+                        ))}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        </section>
       </div>
     </div>
   );

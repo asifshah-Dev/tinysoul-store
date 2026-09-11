@@ -45,22 +45,19 @@ export default function ProductCard({ product, currencySymbol = 'Rs', currencyRa
   const [isAdding, setIsAdding] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
   const { addToCart } = useCart();
-  
-  // Get image from product
+
   const image = product.images?.edges?.[0]?.node?.url || product.image || null;
   const variant = product.variants?.edges?.[0]?.node;
-  
-  // Get price from product
   const priceAmount = variant?.price?.amount || product.price || '0';
 
   const handleAddToCart = async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    
+
     if (isAdding) return;
-    
+
     setIsAdding(true);
-    
+
     const result = addToCart({
       variantId: variant?.id || product.id,
       title: product.title,
@@ -69,19 +66,19 @@ export default function ProductCard({ product, currencySymbol = 'Rs', currencyRa
       quantity: 1,
       image: image || '',
     });
-    
+
     if (!result.success) {
       setErrorMsg(result.message || 'Cannot add to cart');
       setTimeout(() => setErrorMsg(''), 2000);
     }
-    
+
     setTimeout(() => setIsAdding(false), 500);
   };
 
   return (
     <Link
       href={`/product/${product.handle}`}
-      className="group relative block transition-all duration-300 ease-in-out hover:-translate-y-1"
+      className="group relative block"
     >
       <div className="relative overflow-hidden rounded-xl bg-zinc-100">
         <div className="aspect-[3/4] relative">
@@ -90,14 +87,14 @@ export default function ProductCard({ product, currencySymbol = 'Rs', currencyRa
               {!isImageLoaded && (
                 <div className="absolute inset-0 bg-gradient-to-r from-zinc-200 via-zinc-100 to-zinc-200 animate-pulse" />
               )}
-              
+
               <Image
                 src={image}
                 alt={product.title}
                 fill
                 sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
                 className={`
-                  object-cover transition-all duration-700 ease-in-out
+                  object-cover transition-all duration-700 ease-out
                   group-hover:scale-105
                   ${isImageLoaded ? 'opacity-100' : 'opacity-0'}
                 `}
@@ -130,12 +127,12 @@ export default function ProductCard({ product, currencySymbol = 'Rs', currencyRa
         <h3 className="font-medium text-zinc-800 leading-tight group-hover:text-zinc-600 transition-colors duration-300 line-clamp-2">
           {product.title}
         </h3>
-        
+
         <div className="flex items-center justify-between">
           <span className="text-lg font-semibold text-zinc-900 tracking-tight">
             Rs {parseFloat(priceAmount).toLocaleString()}
           </span>
-          
+
           <span className="text-xs font-medium tracking-wide text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-full">
             In Stock
           </span>
@@ -150,9 +147,9 @@ export default function ProductCard({ product, currencySymbol = 'Rs', currencyRa
         <button
           onClick={handleAddToCart}
           disabled={isAdding}
-          className={`w-full mt-2 py-2 text-sm font-medium rounded-lg transition-all ${
+          className={`w-full mt-2 py-2 text-sm font-medium rounded-lg transition-all duration-200 ${
             !isAdding
-              ? 'bg-zinc-900 text-white hover:bg-zinc-800'
+              ? 'bg-zinc-900 text-white hover:bg-zinc-800 active:scale-[0.98]'
               : 'bg-zinc-200 text-zinc-400 cursor-not-allowed'
           }`}
         >

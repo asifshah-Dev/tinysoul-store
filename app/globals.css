@@ -1,14 +1,31 @@
 @import "tailwindcss";
 
 /* ============================================================
-   TINY SOUL — brand palette, extracted from the "T ♥ S" logo
-   Sun-yellow · Grass green · Bubblegum pink · Play orange ·
-   Sky blue · Grape purple (accent only) — on a warm cream field.
-   This is the ONLY color source for the site. No second palette
-   should ever be layered underneath this one.
+   GLOBAL OVERFLOW GUARD
+   Kills horizontal scrollbars from decorative blobs & marquees
+   ============================================================ */
+html {
+  overflow-x: hidden;
+}
+
+body {
+  overflow-x: hidden;
+  max-width: 100%;
+  position: relative;
+}
+
+section {
+  overflow-x: clip;
+}
+
+* {
+  min-width: 0;
+}
+
+/* ============================================================
+   TINY SOUL — brand palette
    ============================================================ */
 @theme {
-  /* ---- SUN YELLOW — the sun face, the T ---- */
   --color-sun-50:  #fffaf0;
   --color-sun-100: #fff2d1;
   --color-sun-200: #ffe4a3;
@@ -20,7 +37,6 @@
   --color-sun-800: #7a5500;
   --color-sun-900: #4d3500;
 
-  /* ---- PLAY ORANGE — "Tiny", S highlight ---- */
   --color-play-50:  #fff5ed;
   --color-play-100: #ffe5d1;
   --color-play-200: #ffc8a3;
@@ -32,7 +48,6 @@
   --color-play-800: #7a2d11;
   --color-play-900: #4d1c0b;
 
-  /* ---- GRASS GREEN — T diagonal stripe ---- */
   --color-grass-50:  #f3fbf3;
   --color-grass-100: #ddf5dd;
   --color-grass-200: #b8e8b8;
@@ -44,7 +59,6 @@
   --color-grass-800: #1e471e;
   --color-grass-900: #142e14;
 
-  /* ---- BUBBLEGUM PINK — T stripe, top of S ---- */
   --color-bubble-50:  #fff2f7;
   --color-bubble-100: #ffdcea;
   --color-bubble-200: #ffb8d3;
@@ -56,7 +70,6 @@
   --color-bubble-800: #77213c;
   --color-bubble-900: #4d1526;
 
-  /* ---- SKY BLUE — "Soul", bottom swirl of S ---- */
   --color-sky-50:  #eff9fe;
   --color-sky-100: #d4eefb;
   --color-sky-200: #a8ddf5;
@@ -68,7 +81,6 @@
   --color-sky-800: #0c3d57;
   --color-sky-900: #082738;
 
-  /* ---- GRAPE PURPLE — star sparkle accent ONLY ---- */
   --color-grape-50:  #f8f2fb;
   --color-grape-100: #eeddf5;
   --color-grape-200: #dbbceb;
@@ -80,7 +92,6 @@
   --color-grape-800: #3a1e47;
   --color-grape-900: #24122c;
 
-  /* ---- CREAM — the neutral field the logo sits on ---- */
   --color-cream-50:  #fffdf7;
   --color-cream-100: #fff9ec;
   --color-cream-200: #fdf1d8;
@@ -113,12 +124,10 @@ p { color: var(--color-cream-700); }
 .text-muted { color: var(--color-cream-500); }
 label { color: var(--color-cream-900); font-weight: 500; }
 
-/* Named heading accents — use ONE per heading, never combine */
 .heading-play  { color: var(--color-play-600); }
 .heading-sky   { color: var(--color-sky-600); }
 .heading-grass { color: var(--color-grass-600); }
 
-/* Hero-level gradient heading, echoes the "Soul" wordmark */
 .heading-gradient {
   background: linear-gradient(90deg, var(--color-play-500) 0%, var(--color-bubble-500) 50%, var(--color-sky-500) 100%);
   -webkit-background-clip: text;
@@ -130,17 +139,15 @@ label { color: var(--color-cream-900); font-weight: 500; }
    LINKS
    ============================================================ */
 a {
- 
   font-weight: 600;
   transition: color 200ms ease;
 }
-a:hover {  }
 
 a.nav-link, a.footer-link { color: var(--color-cream-900); }
 a.nav-link:hover, a.footer-link:hover { color: var(--color-play-600); }
 
 /* ============================================================
-   BUTTONS — five solid brand tones, pill-shaped, glossy
+   BUTTONS
    ============================================================ */
 .btn-sun {
   background: var(--color-sun-400); color: var(--color-cream-900);
@@ -201,15 +208,14 @@ a.nav-link:hover, a.footer-link:hover { color: var(--color-play-600); }
 .product-price { color: var(--color-play-600); font-weight: 700; }
 
 /* ============================================================
-   SECTION BACKGROUNDS — one bold wash at a time, not stacked
+   SECTION BACKGROUNDS
    ============================================================ */
-.section-sun   { background: linear-gradient(180deg, var(--color-sun-50) 0%, var(--color-sun-100) 100%); }
-.section-bubble{ background: linear-gradient(180deg, var(--color-bubble-50) 0%, var(--color-bubble-100) 100%); }
-.section-sky   { background: linear-gradient(180deg, var(--color-sky-50) 0%, var(--color-sky-100) 100%); }
-.section-grass { background: linear-gradient(180deg, var(--color-grass-50) 0%, var(--color-grass-100) 100%); }
-.section-cream { background: linear-gradient(180deg, var(--color-cream-50) 0%, var(--color-cream-200) 100%); }
+.section-sun    { background: linear-gradient(180deg, var(--color-sun-50) 0%, var(--color-sun-100) 100%); }
+.section-bubble { background: linear-gradient(180deg, var(--color-bubble-50) 0%, var(--color-bubble-100) 100%); }
+.section-sky    { background: linear-gradient(180deg, var(--color-sky-50) 0%, var(--color-sky-100) 100%); }
+.section-grass  { background: linear-gradient(180deg, var(--color-grass-50) 0%, var(--color-grass-100) 100%); }
+.section-cream  { background: linear-gradient(180deg, var(--color-cream-50) 0%, var(--color-cream-200) 100%); }
 
-/* Soft blurred color blobs — use ONE per composition for ambience */
 .blob-sun    { background: radial-gradient(circle, rgba(255, 201, 60, 0.4) 0%, transparent 70%); }
 .blob-bubble { background: radial-gradient(circle, rgba(255, 107, 157, 0.35) 0%, transparent 70%); }
 .blob-sky    { background: radial-gradient(circle, rgba(59, 169, 224, 0.35) 0%, transparent 70%); }
@@ -270,3 +276,62 @@ input:focus, textarea:focus, select:focus {
    ============================================================ */
 .no-scrollbar::-webkit-scrollbar { display: none; }
 .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+/* ============================================================
+   Loading screen progress bar
+   ============================================================ */
+.progress-bar-fill {
+  background: linear-gradient(90deg, #F4713A 0%, #FF6B9D 100%);
+  transform-origin: left center;
+  transform: scaleX(0);
+  will-change: transform;
+  animation: progressFill 1.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.progress-bar-icon {
+  will-change: transform;
+  animation: progressMove 1.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes progressFill {
+  from { transform: scaleX(0); }
+  to   { transform: scaleX(1); }
+}
+
+@keyframes progressMove {
+  from { transform: translateX(0%); }
+  to   { transform: translateX(100%); }
+}
+
+/* ============================================================
+   Marquee ticker
+   ============================================================ */
+.marquee-track {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+}
+
+.marquee-content {
+  display: flex;
+  width: max-content;
+  animation: marqueeScroll 40s linear infinite;
+  will-change: transform;
+}
+
+@keyframes marqueeScroll {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .marquee-content {
+    animation: none;
+  }
+}
+/* Hide the native cursor on devices that have a mouse */
+@media (pointer: fine) {
+  html, body, a, button, input, textarea, select {
+    cursor: none;
+  }
+}

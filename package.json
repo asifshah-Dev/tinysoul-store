@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@headlessui/react": "^2.2.10",
+    "@imgly/background-removal": "^1.7.0",
     "axios": "^1.20.0",
     "currency.js": "^2.0.4",
     "dotenv": "^17.4.2",

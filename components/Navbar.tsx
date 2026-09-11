@@ -1,11 +1,20 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Menu, X, Search, ShoppingBag, CreditCard } from 'lucide-react';
+import { Menu, X, Search, ShoppingBag, CreditCard, ArrowRight } from 'lucide-react';
 import { motion, AnimatePresence, Variants } from 'framer-motion';
 import { useCart } from '@/context/CartContext';
+import { fetchProducts } from '@/lib/data-source';
+
+interface SearchProduct {
+  id: string;
+  title: string;
+  handle: string;
+  image?: string | null;
+  productType?: string;
+}
 
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -17,6 +26,48 @@ export default function Navbar() {
   const searchContainerRef = useRef<HTMLDivElement>(null);
   const menuButtonRef = useRef<HTMLButtonElement>(null);
   const searchButtonRef = useRef<HTMLButtonElement>(null);
+
+  // ── Product index for search (fetched once, cached in memory) ──
+  const [products, setProducts] = useState<SearchProduct[]>([]);
+  const [productsLoaded, setProductsLoaded] = useState(false);
+
+  useEffect(() => {
+    let isMounted = true;
+    fetchProducts()
+      .then((data: any[]) => {
+        if (!isMounted) return;
+        setProducts(
+          data.map((p) => ({
+            id: p.id,
+            title: p.title,
+            handle: p.handle,
+            image: p.images?.edges?.[0]?.node?.url || p.image || null,
+            productType: p.productType,
+          }))
+        );
+        setProductsLoaded(true);
+      })
+      .catch((err) => {
+        console.error('Failed to load products for search:', err);
+        setProductsLoaded(true);
+      });
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  // ── Live search results (memoized so it only recomputes on query/products change) ──
+  const searchResults = useMemo(() => {
+    const q = searchQuery.trim().toLowerCase();
+    if (q.length < 2) return [];
+    return products
+      .filter((p) => {
+        const title = (p.title || '').toLowerCase();
+        const type = (p.productType || '').toLowerCase();
+        return title.includes(q) || type.includes(q);
+      })
+      .slice(0, 6);
+  }, [searchQuery, products]);
 
   useEffect(() => {
     if (isSearchOpen && searchInputRef.current) {
@@ -60,11 +111,24 @@ export default function Navbar() {
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    if (searchQuery.trim()) {
-      console.log('Searching for:', searchQuery);
-      setIsSearchOpen(false);
-      setSearchQuery('');
+    const q = searchQuery.trim();
+    if (!q) return;
+
+    // If there's an exact or top result, go straight to it
+    if (searchResults.length > 0) {
+      window.location.href = `/product/${searchResults[0].handle}`;
+      return;
     }
+
+    // Otherwise go to the products list page
+    window.location.href = `/products?q=${encodeURIComponent(q)}`;
+    setIsSearchOpen(false);
+    setSearchQuery('');
+  };
+
+  const handleResultClick = () => {
+    setIsSearchOpen(false);
+    setSearchQuery('');
   };
 
   const menuVariants: Variants = {
@@ -101,14 +165,12 @@ export default function Navbar() {
     { href: '/products/summer', label: 'Summer', color: '#FFC93C' },
     { href: '/products/winter', label: 'Winter', color: '#29ABE2' },
     { href: '/products/sale', label: 'Sale', color: '#F4713A' },
-    { href: '/products/girls-summer', label: 'Girls summer', color: '#FF6B9D' },
-    { href: '/products/boys-winter', label: 'Boys winter', color: '#29ABE2' },
     { href: '/contact', label: 'Contact', color: '#9B59B6' },
   ];
 
   return (
     <>
-      {/* ============ HEADER — fixed, subtle frosted glass ============ */}
+      {/* ============ HEADER ============ */}
       <header className="fixed top-0 left-0 right-0 z-50 px-4 pt-4 bg-white/20 backdrop-blur-md border-b border-white/30">
         <div className="container mx-auto max-w-7xl">
           <div className="flex items-center justify-between h-16 md:h-20 px-4 md:px-6">
@@ -136,19 +198,18 @@ export default function Navbar() {
 
             {/* CENTER: Logo */}
             <Link href="/" className="absolute left-1/2 -translate-x-1/2">
-             <Image
-  src="/logo.png"
-  alt="Tiny Soul"
-  width={500}
-  height={150}
-  className="h-20 md:h-32 w-auto object-contain"
-  priority
-/>
+              <Image
+                src="/logo.png"
+                alt="Tiny Soul"
+                width={500}
+                height={150}
+                className="h-20 md:h-32 w-auto object-contain"
+                priority
+              />
             </Link>
 
             {/* RIGHT: Cart + Checkout icons */}
             <div className="flex items-center gap-1 md:gap-2">
-              {/* Cart icon → /cart */}
               <Link
                 href="/cart"
                 className="relative p-2 rounded-full text-[#2b2b2b] hover:bg-white/70 hover:text-[#FF6B9D] transition-all"
@@ -168,7 +229,6 @@ export default function Navbar() {
                 )}
               </Link>
 
-              {/* Checkout icon → /checkout */}
               <Link
                 href="/checkout"
                 className="p-2 rounded-full text-[#2b2b2b] hover:bg-white/70 hover:text-[#7CB342] transition-all"
@@ -257,7 +317,7 @@ export default function Navbar() {
         )}
       </AnimatePresence>
 
-      {/* ============ SEARCH BAR ============ */}
+      {/* ============ SEARCH BAR — with live results ============ */}
       <AnimatePresence mode="wait">
         {isSearchOpen && (
           <motion.div
@@ -268,8 +328,8 @@ export default function Navbar() {
             exit="exit"
             className="fixed top-24 left-1/2 -translate-x-1/2 z-50 w-[92%] max-w-3xl"
           >
-            <div className="bg-white/55 backdrop-blur-2xl rounded-full px-4 py-2">
-              <form onSubmit={handleSearch} className="flex items-center gap-3">
+            <div className="bg-white/70 backdrop-blur-2xl rounded-3xl shadow-[0_20px_60px_-15px_rgba(43,43,43,0.25)] overflow-hidden">
+              <form onSubmit={handleSearch} className="flex items-center gap-3 px-4 py-2">
                 <button
                   type="submit"
                   className="p-2 text-[#2b2b2b] hover:text-[#29ABE2] transition-colors"
@@ -284,6 +344,7 @@ export default function Navbar() {
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="flex-1 py-2 text-lg bg-transparent text-[#2b2b2b] placeholder:text-[#6f6248]/60 outline-none"
+                  autoComplete="off"
                 />
                 <button
                   type="button"
@@ -294,6 +355,88 @@ export default function Navbar() {
                   <X className="w-6 h-6" />
                 </button>
               </form>
+
+              {/* Live results dropdown */}
+              {searchQuery.trim().length >= 2 && (
+                <div className="border-t border-[#f5e6c8] max-h-[60vh] overflow-y-auto">
+                  {searchResults.length === 0 ? (
+                    <div className="px-5 py-8 text-center">
+                      {!productsLoaded ? (
+                        <p className="text-sm text-[#948362]">Loading products…</p>
+                      ) : (
+                        <>
+                          <p className="text-sm text-[#6f6248]">
+                            No products found for "<span className="font-semibold">{searchQuery}</span>"
+                          </p>
+                          <Link
+                            href="/products"
+                            onClick={handleResultClick}
+                            className="mt-3 inline-flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-[#F4713A] hover:text-[#d9531f]"
+                          >
+                            Browse all products
+                            <ArrowRight className="w-3.5 h-3.5" />
+                          </Link>
+                        </>
+                      )}
+                    </div>
+                  ) : (
+                    <ul className="py-2">
+                      {searchResults.map((product) => (
+                        <li key={product.id}>
+                          <Link
+                            href={`/product/${product.handle}`}
+                            onClick={handleResultClick}
+                            className="flex items-center gap-4 px-5 py-3 hover:bg-[#FFF6E5] transition-colors"
+                          >
+                            {/* Thumbnail */}
+                            <div className="relative w-12 h-12 flex-shrink-0 rounded-lg overflow-hidden bg-[#f5e6c8]">
+                              {product.image ? (
+                                <Image
+                                  src={product.image}
+                                  alt={product.title}
+                                  fill
+                                  className="object-cover"
+                                  sizes="48px"
+                                />
+                              ) : (
+                                <div className="w-full h-full flex items-center justify-center">
+                                  <ShoppingBag className="w-5 h-5 text-[#b8a67e]" />
+                                </div>
+                              )}
+                            </div>
+
+                            {/* Info */}
+                            <div className="flex-1 min-w-0">
+                              <p className="text-sm font-semibold text-[#2b2b2b] line-clamp-1">
+                                {product.title}
+                              </p>
+                              {product.productType && (
+                                <p className="text-xs text-[#948362] mt-0.5">
+                                  {product.productType}
+                                </p>
+                              )}
+                            </div>
+
+                            <ArrowRight className="w-4 h-4 text-[#b8a67e] flex-shrink-0" />
+                          </Link>
+                        </li>
+                      ))}
+
+                      {/* Footer link to full search */}
+                      <li className="border-t border-[#f5e6c8]">
+                        <Link
+                          href={`/products?q=${encodeURIComponent(searchQuery)}`}
+                          onClick={handleResultClick}
+                          className="flex items-center justify-center gap-2 px-5 py-3 text-xs font-bold uppercase tracking-widest text-[#F4713A] hover:bg-[#FFF6E5] transition-colors"
+                        >
+                          See all results
+                          <ArrowRight className="w-3.5 h-3.5" />
+                        </Link>
+                      </li>
+                    </ul>
+                  )}
+                </div>
+              )}
             </div>
           </motion.div>
         )}

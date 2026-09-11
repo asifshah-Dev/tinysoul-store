@@ -8,9 +8,11 @@ const CATEGORY_LABELS: Record<string, string> = {
   'summer': 'Summer Collection',
   'winter': 'Winter Collection',
   'sale': 'On Sale',
-  'girls-summer': 'Girls Summer',
-  'boys-winter': 'Boys Winter',
 };
+
+export function generateStaticParams() {
+  return Object.keys(CATEGORY_LABELS).map((category) => ({ category }));
+}
 
 type PageProps = {
   params: Promise<{ category: string }>;
@@ -44,30 +46,30 @@ export default async function CategoryPage({ params }: PageProps) {
     if (filtered.length === 0) filtered = allProducts;
   } else if (category === 'new-arrivals') {
     filtered = allProducts.slice(0, 12);
-  } else if (category === 'summer' || category === 'girls-summer') {
+  } else if (category === 'summer') {
+    // SUMMER = only girls' items
     filtered = allProducts.filter((p: any) => {
-      const type = (p.productType || '').toLowerCase();
       const title = (p.title || '').toLowerCase();
+      const type = (p.productType || '').toLowerCase();
+      const desc = (p.description || '').toLowerCase();
       return (
-        type.includes('summer') ||
-        title.includes('summer') ||
-        type.includes('girls') ||
-        title.includes('girls')
+        title.includes('girl') ||
+        type.includes('girl') ||
+        desc.includes('girl')
       );
     });
-    if (filtered.length === 0) filtered = allProducts;
-  } else if (category === 'winter' || category === 'boys-winter') {
+  } else if (category === 'winter') {
+    // WINTER = only boys' items
     filtered = allProducts.filter((p: any) => {
-      const type = (p.productType || '').toLowerCase();
       const title = (p.title || '').toLowerCase();
+      const type = (p.productType || '').toLowerCase();
+      const desc = (p.description || '').toLowerCase();
       return (
-        type.includes('winter') ||
-        title.includes('winter') ||
-        type.includes('boys') ||
-        title.includes('boys')
+        title.includes('boy') ||
+        type.includes('boy') ||
+        desc.includes('boy')
       );
     });
-    if (filtered.length === 0) filtered = allProducts;
   }
 
   return (

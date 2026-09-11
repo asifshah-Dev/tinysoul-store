@@ -17,7 +17,7 @@ export default function CheckoutPage() {
   const [orderSummary, setOrderSummary] = useState('');
   const [phoneError, setPhoneError] = useState('');
 
-  const OWNER_PHONE = '923298681953';
+  const OWNER_PHONE = '923024380139';
 
   const countryCodes = [
     { code: '+92', country: 'Pakistan', flag: '🇵🇰' },

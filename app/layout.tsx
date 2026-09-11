@@ -2,9 +2,11 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
 import { CartProvider } from '@/context/CartContext';
+import { LoadingProvider } from '@/context/LoadingContext';
 import Navbar from '@/components/Navbar';
 import CartDrawer from '@/components/CartDrawer';
 import LoadingScreen from '@/components/LoadingScreen';
+import CustomCursor from '@/components/CustomCursor';
 import './globals.css';
 
 export const metadata: Metadata = {
@@ -20,40 +22,123 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <CartProvider>
-          <LoadingScreen />
-          <Navbar />
-          {children}
-          <CartDrawer />
-          <footer className="bg-white border-t border-teal-200/50 mt-16">
-            <div className="container mx-auto px-4 py-12">
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-                <div className="col-span-1 md:col-span-2">
-                  <h3 className="text-lg font-bold text-teal-700">Tiny Soul</h3>
-                  <p className="mt-2 text-sm text-coral-600 max-w-sm">
-                    Premium kids wear curated with love and care. Quality guaranteed.
+        <CustomCursor />
+        <LoadingProvider>
+          <CartProvider>
+            <LoadingScreen />
+            <Navbar />
+            {children}
+            <CartDrawer />
+
+            {/* ============================================================
+                FOOTER — warm cream, brand colors, no newsletter
+                ============================================================ */}
+            <footer className="relative mt-20 bg-[#FFFCF6] border-t border-[#f5e6c8]">
+              <div className="container mx-auto px-6 py-16 md:py-20">
+                <div className="grid grid-cols-1 md:grid-cols-12 gap-10 md:gap-8">
+
+                  {/* Brand column */}
+                  <div className="md:col-span-6">
+                    <Link href="/" className="inline-block mb-6">
+  <Image
+    src="/logo.png"
+    alt="Tiny Soul"
+    width={400}
+    height={140}
+    className="h-20 md:h-32 w-auto object-contain"
+  />
+</Link>
+                    <p className="text-sm text-[#6f6248] max-w-sm leading-relaxed">
+                      Premium kids wear curated with love and care. Every piece is made for little souls who love to play, explore, and grow.
+                    </p>
+
+                    {/* Trust row */}
+                    <div className="mt-6 flex flex-wrap gap-x-6 gap-y-3">
+                      <div className="flex items-center gap-2">
+                        <span className="w-1.5 h-1.5 rounded-full bg-[#7CB342]" />
+                        <span className="text-xs font-bold uppercase tracking-wider text-[#6f6248]">Free Shipping</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="w-1.5 h-1.5 rounded-full bg-[#FF6B9D]" />
+                        <span className="text-xs font-bold uppercase tracking-wider text-[#6f6248]">500+ Parents</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="w-1.5 h-1.5 rounded-full bg-[#29ABE2]" />
+                        <span className="text-xs font-bold uppercase tracking-wider text-[#6f6248]">4.9★ Rated</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Shop links */}
+                  <div className="md:col-span-3">
+                    <h4 className="text-xs font-black uppercase tracking-[0.2em] text-[#2b2b2b] mb-5">
+                      Shop
+                    </h4>
+                    <ul className="space-y-3">
+                      <li>
+                        <Link href="/products" className="group inline-flex items-center gap-2 text-sm text-[#6f6248] hover:text-[#F4713A] transition-colors">
+                          <span className="w-4 h-px bg-current opacity-0 group-hover:opacity-100 transition-opacity" />
+                          All Products
+                        </Link>
+                      </li>
+                      <li>
+                        <Link href="/products/new-arrivals" className="group inline-flex items-center gap-2 text-sm text-[#6f6248] hover:text-[#F4713A] transition-colors">
+                          <span className="w-4 h-px bg-current opacity-0 group-hover:opacity-100 transition-opacity" />
+                          New Arrivals
+                        </Link>
+                      </li>
+                      <li>
+                        <Link href="/products/sale" className="group inline-flex items-center gap-2 text-sm text-[#6f6248] hover:text-[#F4713A] transition-colors">
+                          <span className="w-4 h-px bg-current opacity-0 group-hover:opacity-100 transition-opacity" />
+                          Sale
+                        </Link>
+                      </li>
+                    </ul>
+                  </div>
+
+                  {/* Support links */}
+                  <div className="md:col-span-3">
+                    <h4 className="text-xs font-black uppercase tracking-[0.2em] text-[#2b2b2b] mb-5">
+                      Support
+                    </h4>
+                    <ul className="space-y-3">
+                      <li>
+                        <Link href="/contact" className="group inline-flex items-center gap-2 text-sm text-[#6f6248] hover:text-[#F4713A] transition-colors">
+                          <span className="w-4 h-px bg-current opacity-0 group-hover:opacity-100 transition-opacity" />
+                          Contact
+                        </Link>
+                      </li>
+                      <li>
+                        <Link href="/cart" className="group inline-flex items-center gap-2 text-sm text-[#6f6248] hover:text-[#F4713A] transition-colors">
+                          <span className="w-4 h-px bg-current opacity-0 group-hover:opacity-100 transition-opacity" />
+                          Cart
+                        </Link>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+
+                {/* Bottom bar */}
+                <div className="mt-14 pt-8 border-t border-[#f5e6c8] flex flex-col md:flex-row items-center justify-between gap-4">
+                  <p className="text-xs text-[#948362]">
+                    © {new Date().getFullYear()} Tiny Soul. All rights reserved.
                   </p>
-                </div>
-                <div>
-                  <h4 className="text-sm font-semibold text-teal-700 uppercase tracking-wider">Shop</h4>
-                  <ul className="mt-3 space-y-2">
-                    <li><Link href="/products" className="text-sm text-coral-500 hover:text-teal-600 transition-colors">All Products</Link></li>
-                  </ul>
-                </div>
-                <div>
-                  <h4 className="text-sm font-semibold text-teal-700 uppercase tracking-wider">Support</h4>
-                  <ul className="mt-3 space-y-2">
-                    <li><a href="#" className="text-sm text-coral-500 hover:text-teal-600 transition-colors">Contact</a></li>
-                    <li><a href="#" className="text-sm text-coral-500 hover:text-teal-600 transition-colors">FAQ</a></li>
-                  </ul>
+                  <div className="flex items-center gap-6">
+                    <Link href="#" className="text-xs text-[#948362] hover:text-[#F4713A] transition-colors">
+                      Privacy
+                    </Link>
+                    <Link href="#" className="text-xs text-[#948362] hover:text-[#F4713A] transition-colors">
+                      Terms
+                    </Link>
+                    <Link href="#" className="text-xs text-[#948362] hover:text-[#F4713A] transition-colors">
+                      Shipping
+                    </Link>
+                  </div>
                 </div>
               </div>
-              <div className="mt-8 pt-8 border-t border-teal-200/50 text-center text-sm text-coral-400">
-                © {new Date().getFullYear()} Tiny Soul. All rights reserved.
-              </div>
-            </div>
-          </footer>
-        </CartProvider>
+            </footer>
+          </CartProvider>
+        </LoadingProvider>
       </body>
     </html>
   );

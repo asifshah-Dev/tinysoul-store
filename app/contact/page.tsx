@@ -22,7 +22,7 @@ export default function ContactPage() {
         <div className="grid gap-6">
           {/* WhatsApp */}
           <a
-            href="https://wa.me/923298681953"
+            href="https://wa.me/923024380139"
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center gap-4 p-6 bg-white rounded-2xl border border-gray-100 hover:border-teal-300 transition-colors group"
@@ -34,13 +34,13 @@ export default function ContactPage() {
               <h3 className="font-semibold text-gray-900 group-hover:text-teal-700 transition-colors">
                 WhatsApp
               </h3>
-              <p className="text-sm text-gray-500">+92 329 8681953</p>
+              <p className="text-sm text-gray-500">+92 302 4380139</p>
             </div>
           </a>
 
           {/* Phone */}
           <a
-            href="tel:+923298681953"
+            href="tel:+923024380139"
             className="flex items-center gap-4 p-6 bg-white rounded-2xl border border-gray-100 hover:border-teal-300 transition-colors group"
           >
             <div className="w-14 h-14 rounded-full bg-teal-100 flex items-center justify-center flex-shrink-0">
@@ -50,7 +50,7 @@ export default function ContactPage() {
               <h3 className="font-semibold text-gray-900 group-hover:text-teal-700 transition-colors">
                 Phone
               </h3>
-              <p className="text-sm text-gray-500">+92 329 8681953</p>
+              <p className="text-sm text-gray-500">+92 302 4380139</p>
             </div>
           </a>
 

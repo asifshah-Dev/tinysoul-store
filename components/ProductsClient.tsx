@@ -18,9 +18,7 @@ interface Product {
     edges: Array<{
       node: {
         id: string;
-        price: {
-          amount: string;
-        };
+        price: { amount: string };
         availableForSale: boolean;
         quantityAvailable?: number;
       };
@@ -48,6 +46,8 @@ interface ProductsClientProps {
   initialProducts: Product[];
   isFeatured?: boolean;
 }
+
+const EASE = [0.16, 1, 0.3, 1] as const;
 
 export default function ProductsClient({ initialProducts, isFeatured = false }: ProductsClientProps) {
   const currencySymbol = 'Rs';
@@ -81,34 +81,62 @@ export default function ProductsClient({ initialProducts, isFeatured = false }: 
   const [sidebarStyle, setSidebarStyle] = useState<React.CSSProperties>({ position: 'static' });
   const SIDEBAR_TOP_OFFSET = 96;
 
+  // ============================================================
+  // SIDEBAR STICKY — unchanged
+  // ============================================================
   useEffect(() => {
     if (!showFilters) return;
+
+    let ticking = false;
+    let lastStyle = '';
 
     function updateSidebarPosition() {
       if (!columnsRef.current || !sidebarRef.current) return;
       const containerRect = columnsRef.current.getBoundingClientRect();
       const sidebarHeight = sidebarRef.current.offsetHeight;
 
+      let nextStyle: React.CSSProperties;
+      let nextStyleKey: string;
+
       if (containerRect.top > SIDEBAR_TOP_OFFSET) {
-        setSidebarStyle({ position: 'static' });
+        nextStyle = { position: 'static' };
+        nextStyleKey = 'static';
       } else if (containerRect.bottom < SIDEBAR_TOP_OFFSET + sidebarHeight) {
-        setSidebarStyle({ position: 'absolute', bottom: 0, left: 0, width: 256 });
+        nextStyle = { position: 'absolute', bottom: 0, left: 0, width: 256 };
+        nextStyleKey = 'absolute';
       } else {
-        setSidebarStyle({
+        nextStyle = {
           position: 'fixed',
           top: SIDEBAR_TOP_OFFSET,
           left: containerRect.left,
           width: 256,
+        };
+        nextStyleKey = `fixed-${Math.round(containerRect.left)}`;
+      }
+
+      if (nextStyleKey !== lastStyle) {
+        lastStyle = nextStyleKey;
+        setSidebarStyle(nextStyle);
+      }
+    }
+
+    function onScroll() {
+      if (!ticking) {
+        ticking = true;
+        requestAnimationFrame(() => {
+          updateSidebarPosition();
+          ticking = false;
         });
       }
     }
 
     updateSidebarPosition();
-    window.addEventListener('scroll', updateSidebarPosition, { passive: true });
-    window.addEventListener('resize', updateSidebarPosition);
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll);
+
     return () => {
-      window.removeEventListener('scroll', updateSidebarPosition);
-      window.removeEventListener('resize', updateSidebarPosition);
+      window.removeEventListener('scroll', onScroll);
+      window.removeEventListener('resize', onScroll);
     };
   }, [showFilters]);
 
@@ -217,41 +245,40 @@ export default function ProductsClient({ initialProducts, isFeatured = false }: 
     return option ? option.label : 'Sort';
   };
 
-  const containerVariants: Variants = {
+  // ============================================================
+  // ANIMATION VARIANTS
+  // ============================================================
+  const gridContainerVariants: Variants = {
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
       transition: {
-        staggerChildren: 0.06,
-        delayChildren: 0.1,
+        staggerChildren: 0.07,
+        delayChildren: 0.15,
       },
     },
   };
 
-  const itemVariants: Variants = {
+  const cardVariants: Variants = {
     hidden: {
       opacity: 0,
-      y: 30,
-      scale: 0.95,
+      y: 60,
     },
     visible: {
       opacity: 1,
       y: 0,
-      scale: 1,
       transition: {
-        type: "spring",
-        damping: 20,
-        stiffness: 300,
-        duration: 0.4,
+        duration: 0.7,
+        ease: EASE,
       },
     },
   };
 
   return (
     <div className="relative">
-      {/* Desktop: Two column layout with sticky sidebar */}
+      {/* Desktop */}
       <div className="hidden lg:flex lg:gap-8 relative" ref={columnsRef}>
-        {/* Sidebar - JS-driven sticky */}
+        {/* Sidebar */}
         <AnimatePresence mode="wait">
           {showFilters && (
             <motion.div
@@ -259,104 +286,105 @@ export default function ProductsClient({ initialProducts, isFeatured = false }: 
               animate={{ opacity: 1, width: 256 }}
               exit={{ opacity: 0, width: 0 }}
               transition={{ duration: 0.3, ease: 'easeInOut' }}
-              className="flex-shrink-0 self-stretch overflow-x-hidden"
+              className="flex-shrink-0 self-stretch overflow-hidden"
             >
               <div
                 ref={sidebarRef}
                 style={sidebarStyle}
-                className="w-64 max-h-[calc(100vh-120px)] overflow-y-auto pr-4 space-y-4 lg:space-y-6 no-scrollbar"
+                className="w-64 max-h-[calc(100vh-120px)] overflow-y-auto pr-4 no-scrollbar"
               >
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="font-bold text-teal-700">Filters</h3>
+                <div className="space-y-4 lg:space-y-6">
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="font-bold text-teal-700">Filters</h3>
+                    {activeFilterCount > 0 && (
+                      <button onClick={clearFilters} className="text-sm text-coral-500 hover:text-coral-600">
+                        Clear all
+                      </button>
+                    )}
+                  </div>
+
                   {activeFilterCount > 0 && (
-                    <button onClick={clearFilters} className="text-sm text-coral-500 hover:text-coral-600">
-                      Clear all
-                    </button>
+                    <div className="text-sm text-teal-500 mb-4">Active filters: {activeFilterCount}</div>
                   )}
-                </div>
 
-                {activeFilterCount > 0 && (
-                  <div className="text-sm text-teal-500 mb-4">Active filters: {activeFilterCount}</div>
-                )}
+                  {categories.length > 0 && (
+                    <FilterSection title="Categories">
+                      <div className="space-y-1.5 lg:space-y-2 max-h-48 overflow-y-auto no-scrollbar">
+                        {categories.map(cat => {
+                          const count = initialProducts.filter(p => (p.productType || 'Uncategorized') === cat).length;
+                          return (
+                            <label key={cat} className="flex items-center justify-between cursor-pointer py-1 group">
+                              <span className="text-sm text-gray-700 group-hover:text-teal-700">{cat}</span>
+                              <div className="flex items-center gap-2">
+                                <span className="text-xs text-gray-400">{count}</span>
+                                <input
+                                  type="checkbox"
+                                  checked={filters.categories.includes(cat)}
+                                  onChange={() => toggleCategory(cat)}
+                                  className="w-4 h-4 rounded border-gray-300 text-teal-600 focus:ring-teal-500"
+                                />
+                              </div>
+                            </label>
+                          );
+                        })}
+                      </div>
+                    </FilterSection>
+                  )}
 
-                {categories.length > 0 && (
-                  <FilterSection title="Categories">
-                    <div className="space-y-1.5 lg:space-y-2 max-h-48 overflow-y-auto no-scrollbar">
-                      {categories.map(cat => {
-                        const count = initialProducts.filter(p => (p.productType || 'Uncategorized') === cat).length;
-                        return (
-                          <label key={cat} className="flex items-center justify-between cursor-pointer py-1 group">
-                            <span className="text-sm text-gray-700 group-hover:text-teal-700">{cat}</span>
-                            <div className="flex items-center gap-2">
-                              <span className="text-xs text-gray-400">{count}</span>
-                              <input
-                                type="checkbox"
-                                checked={filters.categories.includes(cat)}
-                                onChange={() => toggleCategory(cat)}
-                                className="w-4 h-4 rounded border-gray-300 text-teal-600 focus:ring-teal-500"
-                              />
-                            </div>
-                          </label>
-                        );
-                      })}
+                  <FilterSection title="Price (PKR)">
+                    <div className="space-y-3">
+                      <div className="flex flex-col sm:flex-row gap-3">
+                        <div className="flex-1">
+                          <label className="text-xs text-gray-600">Min</label>
+                          <input
+                            type="number"
+                            value={priceMin}
+                            onChange={(e) => {
+                              setPriceMin(Number(e.target.value));
+                              applyPriceFilter();
+                            }}
+                            className="w-full mt-1 px-3 py-2 border border-gray-300 rounded-lg text-sm outline-none focus:border-teal-500 transition-colors text-gray-800"
+                            placeholder="0"
+                          />
+                        </div>
+                        <div className="flex-1">
+                          <label className="text-xs text-gray-600">Max</label>
+                          <input
+                            type="number"
+                            value={priceMax}
+                            onChange={(e) => {
+                              setPriceMax(Number(e.target.value));
+                              applyPriceFilter();
+                            }}
+                            className="w-full mt-1 px-3 py-2 border border-gray-300 rounded-lg text-sm outline-none focus:border-teal-500 transition-colors text-gray-800"
+                            placeholder={maxPrice.toString()}
+                          />
+                        </div>
+                      </div>
                     </div>
                   </FilterSection>
-                )}
 
-                <FilterSection title="Price (PKR)">
-                  <div className="space-y-3">
-                    <div className="flex flex-col sm:flex-row gap-3">
-                      <div className="flex-1">
-                        <label className="text-xs text-gray-600">Min</label>
-                        <input
-                          type="number"
-                          value={priceMin}
-                          onChange={(e) => {
-                            setPriceMin(Number(e.target.value));
-                            applyPriceFilter();
-                          }}
-                          className="w-full mt-1 px-3 py-2 border border-gray-300 rounded-lg text-sm outline-none focus:border-teal-500 transition-colors text-gray-800"
-                          placeholder="0"
-                        />
-                      </div>
-                      <div className="flex-1">
-                        <label className="text-xs text-gray-600">Max</label>
-                        <input
-                          type="number"
-                          value={priceMax}
-                          onChange={(e) => {
-                            setPriceMax(Number(e.target.value));
-                            applyPriceFilter();
-                          }}
-                          className="w-full mt-1 px-3 py-2 border border-gray-300 rounded-lg text-sm outline-none focus:border-teal-500 transition-colors text-gray-800"
-                          placeholder={maxPrice.toString()}
-                        />
-                      </div>
-                    </div>
+                  <div className="flex items-center justify-between py-3 border-t border-gray-200">
+                    <span className="text-sm font-medium text-gray-800">In Stock Only</span>
+                    <button
+                      onClick={() => setFilters(prev => ({ ...prev, inStockOnly: !prev.inStockOnly }))}
+                      className={`relative w-11 h-6 rounded-full transition-colors ${filters.inStockOnly ? 'bg-teal-600' : 'bg-gray-300'}`}
+                    >
+                      <div className={`absolute top-1 left-1 w-4 h-4 bg-white rounded-full transition-transform ${filters.inStockOnly ? 'translate-x-5' : 'translate-x-0'}`} />
+                    </button>
                   </div>
-                </FilterSection>
 
-                <div className="flex items-center justify-between py-3 border-t border-gray-200">
-                  <span className="text-sm font-medium text-gray-800">In Stock Only</span>
-                  <button
-                    onClick={() => setFilters(prev => ({ ...prev, inStockOnly: !prev.inStockOnly }))}
-                    className={`relative w-11 h-6 rounded-full transition-colors ${filters.inStockOnly ? 'bg-teal-600' : 'bg-gray-300'}`}
-                  >
-                    <div className={`absolute top-1 left-1 w-4 h-4 bg-white rounded-full transition-transform ${filters.inStockOnly ? 'translate-x-5' : 'translate-x-0'}`} />
-                  </button>
-                </div>
-
-                <div className="pt-4 text-sm text-gray-500 border-t border-gray-200">
-                  {filteredProducts.length} products
+                  <div className="pt-4 text-sm text-gray-500 border-t border-gray-200">
+                    {filteredProducts.length} products
+                  </div>
                 </div>
               </div>
             </motion.div>
           )}
         </AnimatePresence>
 
-        {/* Product Grid - NO BACKGROUND COLOR */}
+        {/* Main column */}
         <div className="flex-1 min-w-0">
-          {/* Toolbar */}
           <div className="flex flex-wrap items-center justify-between gap-2 md:gap-3 mb-6">
             <div className="flex items-center gap-2">
               <button
@@ -407,15 +435,16 @@ export default function ProductsClient({ initialProducts, isFeatured = false }: 
             </div>
           </div>
 
-          {/* Product grid - NO BACKGROUND */}
+          {/* Product grid */}
           <motion.div
-            variants={containerVariants}
+            variants={gridContainerVariants}
             initial="hidden"
-            animate="visible"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.05 }}
             className={`
               grid gap-4 md:gap-6
-              ${viewMode === 'grid' 
-                ? 'grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4' 
+              ${viewMode === 'grid'
+                ? 'grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4'
                 : 'grid-cols-1'
               }
             `}
@@ -429,9 +458,13 @@ export default function ProductsClient({ initialProducts, isFeatured = false }: 
               </div>
             ) : (
               filteredProducts.map((p) => (
-                <motion.div key={p.id} variants={itemVariants}>
-                  <ProductCard 
-                    product={p} 
+                <motion.div
+                  key={p.id}
+                  variants={cardVariants}
+                  style={{ willChange: 'transform, opacity' }}
+                >
+                  <ProductCard
+                    product={p}
                     currencySymbol={currencySymbol}
                     currencyRate={currencyRate}
                   />
@@ -442,17 +475,16 @@ export default function ProductsClient({ initialProducts, isFeatured = false }: 
         </div>
       </div>
 
-      {/* Mobile View */}
+      {/* Mobile */}
       <div className="lg:hidden">
-        {/* Toolbar */}
         <div className="flex flex-wrap items-center justify-between gap-2 mb-4">
           <div className="flex items-center gap-2">
             <div className="flex items-center border border-gray-300 rounded-lg overflow-hidden bg-white">
               <button
                 onClick={() => setViewMode('grid')}
                 className={`p-2 transition-colors ${
-                  viewMode === 'grid' 
-                    ? 'bg-teal-600 text-white' 
+                  viewMode === 'grid'
+                    ? 'bg-teal-600 text-white'
                     : 'text-gray-400 hover:text-gray-700'
                 }`}
               >
@@ -461,8 +493,8 @@ export default function ProductsClient({ initialProducts, isFeatured = false }: 
               <button
                 onClick={() => setViewMode('list')}
                 className={`p-2 transition-colors ${
-                  viewMode === 'list' 
-                    ? 'bg-teal-600 text-white' 
+                  viewMode === 'list'
+                    ? 'bg-teal-600 text-white'
                     : 'text-gray-400 hover:text-gray-700'
                 }`}
               >
@@ -485,10 +517,7 @@ export default function ProductsClient({ initialProducts, isFeatured = false }: 
           </div>
 
           <div className="flex items-center gap-2">
-            <span className="text-sm text-gray-500">
-              {filteredProducts.length}
-            </span>
-
+            <span className="text-sm text-gray-500">{filteredProducts.length}</span>
             <div className="relative" ref={sortRef}>
               <button
                 onClick={() => setIsSortOpen(!isSortOpen)}
@@ -521,15 +550,15 @@ export default function ProductsClient({ initialProducts, isFeatured = false }: 
           </div>
         </div>
 
-        {/* Product grid - Mobile - NO BACKGROUND */}
         <motion.div
-          variants={containerVariants}
+          variants={gridContainerVariants}
           initial="hidden"
-          animate="visible"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.05 }}
           className={`
             grid gap-4
-            ${viewMode === 'grid' 
-              ? 'grid-cols-2 sm:grid-cols-2 md:grid-cols-3' 
+            ${viewMode === 'grid'
+              ? 'grid-cols-2 sm:grid-cols-2 md:grid-cols-3'
               : 'grid-cols-1'
             }
           `}
@@ -543,9 +572,13 @@ export default function ProductsClient({ initialProducts, isFeatured = false }: 
             </div>
           ) : (
             filteredProducts.map((p) => (
-              <motion.div key={p.id} variants={itemVariants}>
-                <ProductCard 
-                  product={p} 
+              <motion.div
+                key={p.id}
+                variants={cardVariants}
+                style={{ willChange: 'transform, opacity' }}
+              >
+                <ProductCard
+                  product={p}
                   currencySymbol={currencySymbol}
                   currencyRate={currencyRate}
                 />
@@ -567,17 +600,11 @@ export default function ProductsClient({ initialProducts, isFeatured = false }: 
               className="fixed inset-0 z-40 bg-black/50"
               onClick={() => setIsMobileFilterOpen(false)}
             />
-            
             <motion.div
               initial={{ y: '100%' }}
               animate={{ y: 0 }}
               exit={{ y: '100%' }}
-              transition={{ 
-                type: "spring",
-                damping: 30, 
-                stiffness: 300,
-                mass: 0.8
-              }}
+              transition={{ type: 'spring', damping: 30, stiffness: 300, mass: 0.8 }}
               className="fixed bottom-0 left-0 right-0 z-50 bg-white rounded-t-2xl max-h-[85vh] overflow-y-auto"
             >
               <div className="flex justify-center pt-2 pb-1">
@@ -589,14 +616,11 @@ export default function ProductsClient({ initialProducts, isFeatured = false }: 
                   <h3 className="font-bold text-lg text-teal-700">Filters</h3>
                   <div className="flex items-center gap-2">
                     {activeFilterCount > 0 && (
-                      <button 
-                        onClick={clearFilters} 
-                        className="text-sm text-coral-500 hover:text-coral-600"
-                      >
+                      <button onClick={clearFilters} className="text-sm text-coral-500 hover:text-coral-600">
                         Clear all
                       </button>
                     )}
-                    <button 
+                    <button
                       onClick={() => setIsMobileFilterOpen(false)}
                       className="p-2 hover:bg-teal-50 rounded-lg transition-colors"
                     >
@@ -665,9 +689,7 @@ export default function ProductsClient({ initialProducts, isFeatured = false }: 
                       {sortOptions.map((option) => (
                         <button
                           key={option.value}
-                          onClick={() => {
-                            setSortBy(option.value);
-                          }}
+                          onClick={() => setSortBy(option.value)}
                           className={`flex items-center justify-between w-full px-3 py-2 text-sm rounded-lg transition-colors ${
                             sortBy === option.value
                               ? 'bg-teal-600 text-white'
@@ -675,17 +697,15 @@ export default function ProductsClient({ initialProducts, isFeatured = false }: 
                           }`}
                         >
                           {option.label}
-                          {sortBy === option.value && (
-                            <Check className="w-4 h-4" />
-                          )}
+                          {sortBy === option.value && <Check className="w-4 h-4" />}
                         </button>
                       ))}
                     </div>
                   </div>
                 </div>
 
-                <button 
-                  onClick={() => setIsMobileFilterOpen(false)} 
+                <button
+                  onClick={() => setIsMobileFilterOpen(false)}
                   className="w-full py-3 bg-teal-600 text-white rounded-xl font-medium hover:bg-teal-700 transition-colors"
                 >
                   Apply Filters ({filteredProducts.length} products)

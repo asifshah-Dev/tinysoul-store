@@ -27,6 +27,47 @@ export async function generateMetadata({ params }: PageProps) {
   };
 }
 
+// ============================================================
+// PRICE HELPERS — safe for both data shapes
+// ============================================================
+function getFirstVariant(product: any): any {
+  if (!product?.variants) return null;
+  if (Array.isArray(product.variants)) return product.variants[0] || null;
+  if (Array.isArray(product.variants.edges)) {
+    return product.variants.edges[0]?.node || null;
+  }
+  return null;
+}
+
+function getPrice(product: any): number {
+  const variant = getFirstVariant(product);
+  const raw =
+    (typeof variant?.price === 'string' && variant.price) ||
+    variant?.price?.amount ||
+    product?.price ||
+    '0';
+  const n = parseFloat(raw);
+  return isNaN(n) ? 0 : n;
+}
+
+function getCompareAtPrice(product: any): number {
+  const variant = getFirstVariant(product);
+  const raw =
+    (typeof variant?.compareAtPrice === 'string' && variant.compareAtPrice) ||
+    variant?.compareAtPrice?.amount ||
+    '0';
+  const n = parseFloat(raw);
+  return isNaN(n) ? 0 : n;
+}
+
+function isOnSale(product: any): boolean {
+  const price = getPrice(product);
+  const compareAt = getCompareAtPrice(product);
+  return compareAt > price && price > 0;
+}
+
+// ============================================================
+
 export default async function CategoryPage({ params }: PageProps) {
   const { category } = await params;
 
@@ -38,16 +79,11 @@ export default async function CategoryPage({ params }: PageProps) {
   let filtered = allProducts;
 
   if (category === 'sale') {
-    filtered = allProducts.filter((p: any) => {
-      const title = (p.title || '').toLowerCase();
-      const type = (p.productType || '').toLowerCase();
-      return title.includes('sale') || type.includes('sale');
-    });
-    if (filtered.length === 0) filtered = allProducts;
+    filtered = allProducts.filter((p: any) => isOnSale(p));
   } else if (category === 'new-arrivals') {
     filtered = allProducts.slice(0, 12);
   } else if (category === 'summer') {
-    // SUMMER = only girls' items
+    // Summer = all girls' items
     filtered = allProducts.filter((p: any) => {
       const title = (p.title || '').toLowerCase();
       const type = (p.productType || '').toLowerCase();
@@ -59,16 +95,11 @@ export default async function CategoryPage({ params }: PageProps) {
       );
     });
   } else if (category === 'winter') {
-    // WINTER = only boys' items
+    // ✅ Winter = ONLY boys' track suits
     filtered = allProducts.filter((p: any) => {
+      const type = (p.productType || '').toLowerCase().trim();
       const title = (p.title || '').toLowerCase();
-      const type = (p.productType || '').toLowerCase();
-      const desc = (p.description || '').toLowerCase();
-      return (
-        title.includes('boy') ||
-        type.includes('boy') ||
-        desc.includes('boy')
-      );
+      return type === 'track suit' && title.includes('boy');
     });
   }
 

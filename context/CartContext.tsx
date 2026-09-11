@@ -2,7 +2,15 @@
 
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 
-interface CartItem {
+// ============================================================
+// TYPES
+// ============================================================
+export interface CartOption {
+  name: string;
+  value: string;
+}
+
+export interface CartItem {
   id: string;
   variantId: string;
   title: string;
@@ -11,7 +19,7 @@ interface CartItem {
   quantity: number;
   image?: string;
   maxQuantity?: number;
-  selectedOptions?: Array<{ name: string; value: string }>;
+  selectedOptions: CartOption[];
 }
 
 interface CartContextType {
@@ -30,26 +38,47 @@ interface CartContextType {
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
+const STORAGE_KEY = 'cart';
+
 export function CartProvider({ children }: { children: ReactNode }) {
   const [cart, setCart] = useState<CartItem[]>([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
 
+  // Load from localStorage on mount
   useEffect(() => {
-    const savedCart = localStorage.getItem('cart');
-    if (savedCart) {
-      try {
-        setCart(JSON.parse(savedCart));
-      } catch (e) {
-        console.error('Failed to parse cart:', e);
+    try {
+      const savedCart = localStorage.getItem(STORAGE_KEY);
+      if (savedCart) {
+        const parsed = JSON.parse(savedCart);
+        if (Array.isArray(parsed)) {
+          // Ensure every item has a selectedOptions array (defaults to [])
+          const normalized: CartItem[] = parsed.map((item: any) => ({
+            id: item.id || `${item.variantId}_${Date.now()}`,
+            variantId: item.variantId || item.id || '',
+            title: item.title || '',
+            handle: item.handle || '',
+            price: typeof item.price === 'number' ? item.price : parseFloat(item.price || '0'),
+            quantity: typeof item.quantity === 'number' ? item.quantity : 1,
+            image: item.image || '',
+            maxQuantity: item.maxQuantity,
+            selectedOptions: Array.isArray(item.selectedOptions)
+              ? item.selectedOptions
+              : [],
+          }));
+          setCart(normalized);
+        }
       }
+    } catch (e) {
+      console.error('Failed to parse cart:', e);
     }
     setIsLoaded(true);
   }, []);
 
+  // Save to localStorage whenever cart changes
   useEffect(() => {
     if (isLoaded) {
-      localStorage.setItem('cart', JSON.stringify(cart));
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(cart));
     }
   }, [cart, isLoaded]);
 
@@ -61,16 +90,16 @@ export function CartProvider({ children }: { children: ReactNode }) {
       cartItem => cartItem.variantId === item.variantId
     );
 
-    const currentQuantity = existingItemIndex !== -1 
-      ? cart[existingItemIndex].quantity 
+    const currentQuantity = existingItemIndex !== -1
+      ? cart[existingItemIndex].quantity
       : 0;
-    
+
     const newQuantity = currentQuantity + item.quantity;
-    
+
     if (item.maxQuantity !== undefined && newQuantity > item.maxQuantity) {
-      return { 
-        success: false, 
-        message: `Only ${item.maxQuantity} items available. You have ${currentQuantity} in cart.` 
+      return {
+        success: false,
+        message: `Only ${item.maxQuantity} items available. You have ${currentQuantity} in cart.`,
       };
     }
 
@@ -78,18 +107,21 @@ export function CartProvider({ children }: { children: ReactNode }) {
       if (existingItemIndex !== -1) {
         const updatedCart = [...prevCart];
         updatedCart[existingItemIndex].quantity = newQuantity;
+        // keep selectedOptions from the new item (in case they differ — shouldn't, but safe)
+        updatedCart[existingItemIndex].selectedOptions = item.selectedOptions || [];
         return updatedCart;
       } else {
         return [
           ...prevCart,
           {
             ...item,
+            selectedOptions: Array.isArray(item.selectedOptions) ? item.selectedOptions : [],
             id: `${item.variantId}_${Date.now()}`,
           },
         ];
       }
     });
-    
+
     setIsCartOpen(true);
     return { success: true };
   };

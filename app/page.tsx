@@ -4,6 +4,7 @@ import { fetchProducts } from '@/lib/data-source';
 import ProductCard from '@/components/ProductCard';
 import Hero from '@/components/Hero';
 import ProductsClient from '@/components/ProductsClient';
+import CategoryStrip from '@/components/CategoryStrip';
 
 export default async function Home() {
   const products = await fetchProducts();
@@ -21,7 +22,7 @@ export default async function Home() {
   return (
     <main className="relative min-h-screen bg-cream-50 isolate">
 
-      {/* Blob layer — z-0, sits behind content, above the cream */}
+      {/* Blob layer */}
       <div
         aria-hidden
         className="pointer-events-none absolute inset-0 overflow-hidden z-0"
@@ -52,14 +53,17 @@ export default async function Home() {
         />
       </div>
 
-      {/* Content wrapper — z-10, sits above the blobs */}
+      {/* Content */}
       <div className="relative z-10">
 
-        {/* Hero Section */}
+        {/* Hero */}
         <Hero slides={heroSlides} autoPlay={true} interval={5000} />
 
+        {/* ═══ NEW: Category shortcuts ═══ */}
+        <CategoryStrip />
+
         {/* Products Section */}
-        <section className="container mx-auto px-4 py-16">
+        <section className="container mx-auto px-4 pt-10 md:pt-12 pb-16">
           <div className="flex items-center justify-between mb-8">
             <div>
               <h2 className="text-2xl md:text-3xl font-bold text-cream-900 tracking-tight">
@@ -69,15 +73,7 @@ export default async function Home() {
                 Premium kids wear from TinySoul Pakistan
               </p>
             </div>
-            <Link
-              href="/product"
-              className="text-sm font-medium text-cream-700 hover:text-[#F4713A] transition-colors duration-300 flex items-center gap-1"
-            >
-              View All
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-              </svg>
-            </Link>
+           
           </div>
 
           <ProductsClient initialProducts={products} isFeatured={true} />
@@ -86,4 +82,3 @@ export default async function Home() {
     </main>
   );
 }
-// force rebuild

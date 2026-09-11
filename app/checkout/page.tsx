@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useCart } from '@/context/CartContext';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -37,30 +37,21 @@ export default function CheckoutPage() {
 
   const validatePhoneNumber = (phone: string, countryCode: string) => {
     const cleanPhone = phone.replace(/[\s\-\(\)]/g, '');
-    if (countryCode === '+92') {
-      return /^3\d{9}$/.test(cleanPhone);
-    }
-    if (countryCode === '+91') {
-      return /^\d{10}$/.test(cleanPhone);
-    }
-    if (countryCode === '+1' || countryCode === '+44') {
-      return /^\d{10}$/.test(cleanPhone);
-    }
-    if (countryCode === '+971' || countryCode === '+966') {
-      return /^\d{9}$/.test(cleanPhone);
-    }
+    if (countryCode === '+92') return /^3\d{9}$/.test(cleanPhone);
+    if (countryCode === '+91') return /^\d{10}$/.test(cleanPhone);
+    if (countryCode === '+1' || countryCode === '+44') return /^\d{10}$/.test(cleanPhone);
+    if (countryCode === '+971' || countryCode === '+966') return /^\d{9}$/.test(cleanPhone);
     return cleanPhone.length >= 7;
   };
 
   const getPhoneError = (phone: string, countryCode: string) => {
     const cleanPhone = phone.replace(/[\s\-\(\)]/g, '');
     if (!cleanPhone) return '';
-    
     const country = countryCodes.find(c => c.code === countryCode);
     let requiredLength = 10;
     if (countryCode === '+971' || countryCode === '+966') requiredLength = 9;
     if (countryCode === '+92') requiredLength = 10;
-    
+
     if (cleanPhone.length < requiredLength) {
       return `Please enter ${requiredLength} digits for ${country?.country || ''}`;
     }
@@ -84,6 +75,7 @@ export default function CheckoutPage() {
     setPhoneError(error);
   };
 
+  // ═══ WhatsApp message with color + size ═══
   const generateOrderSummary = () => {
     let summary = '🛍️ *New Order Received!*%0A';
     summary += `%0A👤 *Customer Details*%0A`;
@@ -91,13 +83,22 @@ export default function CheckoutPage() {
     summary += `Phone: ${selectedCountryCode} ${customerPhone}%0A`;
     summary += `Address: ${customerAddress || 'Not provided'}%0A`;
     summary += `%0A📦 *Order Details*%0A`;
-    
-    cart.forEach((item, index) => {
-      summary += `%0A${index + 1}. ${item.title}%0A`;
+
+    cart.forEach((item: any, index: number) => {
+      summary += `%0A${index + 1}. ${item.title?.split('|')[0]?.trim() || item.title}%0A`;
+
+      if (Array.isArray(item.selectedOptions) && item.selectedOptions.length > 0) {
+        const optionLine = item.selectedOptions
+          .filter((opt: any) => opt?.name && opt?.value)
+          .map((opt: any) => `${opt.name}: ${opt.value}`)
+          .join(' | ');
+        if (optionLine) summary += `   ${optionLine}%0A`;
+      }
+
       summary += `   Quantity: ${item.quantity}%0A`;
       summary += `   Price: Rs ${(item.price * item.quantity).toLocaleString()}%0A`;
     });
-    
+
     summary += `%0A💰 *Total: Rs ${cartTotal.toLocaleString()}*%0A`;
     summary += `%0A📦 *Total Items: ${cartCount}*%0A`;
     summary += `%0A---%0A`;
@@ -122,9 +123,7 @@ export default function CheckoutPage() {
     setOrderSummary(message);
     setOrderPlaced(true);
     setIsSubmitting(false);
-    setTimeout(() => {
-      clearCart();
-    }, 2000);
+    setTimeout(() => clearCart(), 2000);
   };
 
   if (cart.length === 0 && !orderPlaced) {
@@ -152,7 +151,7 @@ export default function CheckoutPage() {
         <h1 className="text-3xl font-bold text-gray-900 mb-8">Checkout</h1>
 
         <div className="lg:hidden mb-8">
-          <OrderSummaryCard 
+          <OrderSummaryCard
             cart={cart}
             cartCount={cartCount}
             cartTotal={cartTotal}
@@ -165,7 +164,7 @@ export default function CheckoutPage() {
           <div className="order-2 lg:order-1">
             <div className="bg-white rounded-2xl p-6 border border-gray-100">
               <h2 className="text-xl font-semibold text-gray-800 mb-6">Customer Details</h2>
-              
+
               <div className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Full Name *</label>
@@ -198,7 +197,7 @@ export default function CheckoutPage() {
                         ))}
                       </select>
                     </div>
-                    
+
                     <div className="flex-1 relative">
                       <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                       <input
@@ -250,7 +249,7 @@ export default function CheckoutPage() {
                   disabled={isSubmitting || !customerName || !customerPhone || !!phoneError}
                   className={`w-full py-4 rounded-xl font-semibold text-lg text-white transition-all flex items-center justify-center gap-2 ${
                     !isSubmitting && customerName && customerPhone && !phoneError
-                      ? 'bg-green-600 hover:bg-green-700 shadow-lg' 
+                      ? 'bg-green-600 hover:bg-green-700 shadow-lg'
                       : 'bg-gray-300 cursor-not-allowed'
                   }`}
                   style={{ color: 'white !important' }}
@@ -263,7 +262,7 @@ export default function CheckoutPage() {
           </div>
 
           <div className="order-1 lg:order-2 hidden lg:block">
-            <OrderSummaryCard 
+            <OrderSummaryCard
               cart={cart}
               cartCount={cartCount}
               cartTotal={cartTotal}
@@ -307,7 +306,7 @@ function OrderSummaryCard({ cart, cartCount, cartTotal, removeFromCart, updateQu
   return (
     <div className="bg-white rounded-2xl p-6 border border-gray-100 sticky top-24">
       <h2 className="text-xl font-semibold text-gray-800 mb-6">Order Summary</h2>
-      
+
       <div className="space-y-4 max-h-[400px] overflow-y-auto">
         {cart.map((item: any) => (
           <div key={item.id} className="flex gap-4 py-4 border-b border-gray-100">
@@ -321,8 +320,26 @@ function OrderSummaryCard({ cart, cartCount, cartTotal, removeFromCart, updateQu
               )}
             </div>
             <div className="flex-1 min-w-0">
-              <h4 className="font-medium text-gray-800 text-sm line-clamp-1">{item.title}</h4>
-              <div className="flex items-center justify-between mt-1">
+              <h4 className="font-medium text-gray-800 text-sm line-clamp-1">
+                {item.title?.split('|')[0]?.trim() || item.title}
+              </h4>
+
+              {Array.isArray(item.selectedOptions) && item.selectedOptions.length > 0 && (
+                <div className="flex flex-wrap gap-1 mt-1">
+                  {item.selectedOptions
+                    .filter((opt: any) => opt?.name && opt?.value)
+                    .map((opt: any, i: number) => (
+                      <span
+                        key={i}
+                        className="text-[10px] font-bold uppercase tracking-wider text-[#6f6248] bg-[#fdf6e3] px-2 py-0.5 rounded-full"
+                      >
+                        {opt.value}
+                      </span>
+                    ))}
+                </div>
+              )}
+
+              <div className="flex items-center justify-between mt-2">
                 <span className="text-sm font-semibold text-teal-600">
                   Rs {(item.price * item.quantity).toLocaleString()}
                 </span>

@@ -111,10 +111,6 @@ export default function Hero({ slides = [], autoPlay = true, interval = 5500 }: 
   const [direction, setDirection] = useState<1 | -1>(1);
   const prefersReducedMotion = useReducedMotion();
 
-  // ============================================================
-  // ROLLER SCROLL — Direct DOM writes, rAF throttled, no React state
-  // Wrapper holds the perspective. Section rotates on bottom edge.
-  // ============================================================
   const wrapperRef = useRef<HTMLDivElement>(null);
   const sectionRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
@@ -137,31 +133,23 @@ export default function Hero({ slides = [], autoPlay = true, interval = 5500 }: 
       const rect = wrapper.getBoundingClientRect();
       const heroHeight = Math.max(1, rect.height);
 
-      // 0 at page top → 1 when the hero has scrolled a full hero-height past the top
       const raw = Math.min(1, Math.max(0, -rect.top / heroHeight));
 
-      // Skip if nothing meaningfully changed
       if (Math.abs(raw - lastProgress) < 0.0008) {
         ticking = false;
         return;
       }
       lastProgress = raw;
 
-      // ── Roller angles ──
-      // rotateX POSITIVE tilts the TOP edge away from viewer.
-      // With transformOrigin 'center bottom', the bottom stays put
-      // and the top arcs back — reads like the section is rolling
-      // away from the viewer on a hinge.
-      const rotateX = -18 * raw;        // negative → top tips AWAY
-      const liftY = -20 * raw;           // subtle lift
-      const scale = 1 - 0.045 * raw;     // shrinks to ~95.5%
-      const opacity = 1 - 0.55 * raw;    // fades to 45%
+      const rotateX = -18 * raw;
+      const liftY = -20 * raw;
+      const scale = 1 - 0.045 * raw;
+      const opacity = 1 - 0.55 * raw;
 
       section.style.transform =
         `rotateX(${rotateX}deg) translateY(${liftY}px) scale(${scale})`;
       section.style.opacity = String(opacity);
 
-      // ── Inner parallax — text slower, image faster ──
       if (content) {
         content.style.transform = `translateY(${-40 * raw}px)`;
       }
@@ -286,8 +274,6 @@ export default function Hero({ slides = [], autoPlay = true, interval = 5500 }: 
   };
 
   return (
-    // OUTER WRAPPER — holds perspective, is the scroll measurement target
-    // This is a plain <div>, so refs hydrate reliably (no Framer wrapper issue)
     <div
       ref={wrapperRef}
       style={{
@@ -295,7 +281,6 @@ export default function Hero({ slides = [], autoPlay = true, interval = 5500 }: 
         perspectiveOrigin: 'center bottom',
       }}
     >
-      {/* INNER SECTION — this is what rotates as you scroll */}
       <div
         ref={sectionRef}
         style={{
@@ -332,14 +317,14 @@ export default function Hero({ slides = [], autoPlay = true, interval = 5500 }: 
             />
           </div>
 
-          <div className="relative min-h-[560px] md:min-h-[640px] lg:min-h-[700px] flex items-center pt-28 pb-16 md:pt-32 md:pb-20">
+          <div className="relative min-h-[560px] md:min-h-[640px] lg:min-h-[700px] flex items-center pt-28 pb-6 md:pt-32 md:pb-10">
             <div className="container mx-auto px-6 md:px-12 relative z-10">
               <div className="grid grid-cols-1 md:grid-cols-12 gap-10 md:gap-8 items-center">
 
-                {/* LEFT — Text column with parallax ref */}
+                {/* LEFT — Text column */}
                 <div
                   ref={contentRef}
-                  className="md:col-span-5 order-2 md:order-1"
+                  className="md:col-span-5 order-2 md:order-1 pb-6 md:pb-0"
                   style={{ willChange: 'transform' }}
                 >
                   <AnimatePresence mode="wait">
@@ -449,7 +434,7 @@ export default function Hero({ slides = [], autoPlay = true, interval = 5500 }: 
 
                       <motion.div
                         variants={contentItem}
-                        className="mt-10 pt-8 border-t border-[#2b2b2b]/10 flex flex-wrap gap-x-8 gap-y-3 justify-center md:justify-start"
+                        className="mt-8 md:mt-10 pt-6 md:pt-8 border-t border-[#2b2b2b]/10 flex flex-wrap gap-x-4 md:gap-x-8 gap-y-2 md:gap-y-3 justify-center md:justify-start"
                       >
                         {[
                           { color: '#7CB342', label: 'Free Shipping' },
@@ -480,7 +465,7 @@ export default function Hero({ slides = [], autoPlay = true, interval = 5500 }: 
                   </AnimatePresence>
                 </div>
 
-                {/* RIGHT — Image column with parallax ref */}
+                {/* RIGHT — Image column */}
                 <div
                   ref={imageRef}
                   className="md:col-span-7 order-1 md:order-2 relative flex items-center justify-center"
@@ -505,6 +490,47 @@ export default function Hero({ slides = [], autoPlay = true, interval = 5500 }: 
                           className="relative z-10"
                           tolerance={245}
                         />
+                      )}
+
+                      {/* MOBILE ARROWS — overlaid on the image */}
+                      {slides.length > 1 && (
+                        <>
+                          <motion.button
+                            onClick={prevSlide}
+                            aria-label="Previous slide"
+                            whileTap={{ scale: 0.9 }}
+                            transition={{ type: 'spring', stiffness: 400, damping: 22 }}
+                            className="md:hidden absolute left-0 top-1/2 -translate-y-1/2 z-30
+                                       flex items-center justify-center
+                                       w-10 h-10 rounded-full
+                                       bg-white/80 backdrop-blur-md
+                                       border border-white/70
+                                       text-[#2b2b2b]
+                                       shadow-md
+                                       active:bg-white
+                                       touch-manipulation"
+                          >
+                            <ChevronLeft className="w-5 h-5" />
+                          </motion.button>
+
+                          <motion.button
+                            onClick={nextSlide}
+                            aria-label="Next slide"
+                            whileTap={{ scale: 0.9 }}
+                            transition={{ type: 'spring', stiffness: 400, damping: 22 }}
+                            className="md:hidden absolute right-0 top-1/2 -translate-y-1/2 z-30
+                                       flex items-center justify-center
+                                       w-10 h-10 rounded-full
+                                       bg-white/80 backdrop-blur-md
+                                       border border-white/70
+                                       text-[#2b2b2b]
+                                       shadow-md
+                                       active:bg-white
+                                       touch-manipulation"
+                          >
+                            <ChevronRight className="w-5 h-5" />
+                          </motion.button>
+                        </>
                       )}
 
                       <motion.div
@@ -540,12 +566,13 @@ export default function Hero({ slides = [], autoPlay = true, interval = 5500 }: 
               </div>
             </div>
 
+            {/* DESKTOP-ONLY CONTROLS */}
             {slides.length > 1 && (
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: reduce ? 0 : 1.1, duration: 0.6, ease: EASE }}
-                className="absolute bottom-20 md:bottom-24 left-1/2 md:left-auto md:right-12 -translate-x-1/2 md:translate-x-0 z-30 flex items-center gap-4"
+                className="hidden md:flex absolute md:bottom-16 md:right-12 z-40 items-center gap-4"
               >
                 <motion.button
                   onClick={prevSlide}
@@ -590,11 +617,12 @@ export default function Hero({ slides = [], autoPlay = true, interval = 5500 }: 
             )}
           </div>
 
+          {/* MARQUEE */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: reduce ? 0 : 1.2, duration: 0.7, ease: EASE }}
-            className="relative z-20 w-full pb-8 md:pb-10"
+            className="relative z-20 w-full pb-6 md:pb-8"
           >
             <div className="container mx-auto px-6 md:px-12">
               <div className="relative rounded-full bg-[#2b2b2b] overflow-hidden py-4">
@@ -612,7 +640,7 @@ export default function Hero({ slides = [], autoPlay = true, interval = 5500 }: 
                 <div className="marquee-track">
                   <div className="marquee-content">
                     {[...Array(2)].map((_, dupIdx) => (
-                      <div key={dupIdx} className="flex items-center gap-6 px-3 shrink-0">
+                      <div key={dupIdx} className="flex items-center gap-3 md:gap-6 px-2 md:px-3 shrink-0">
                         {[
                           { label: 'Free Shipping Rs 5,000+', dot: '#7CB342' },
                           { label: 'New Arrivals Weekly', dot: '#FF6B9D' },
@@ -621,8 +649,8 @@ export default function Hero({ slides = [], autoPlay = true, interval = 5500 }: 
                           { label: 'Made for Little Souls', dot: '#9B59B6' },
                           { label: 'Easy Returns', dot: '#F4713A' },
                         ].map((item, i) => (
-                          <div key={`${dupIdx}-${i}`} className="flex items-center gap-6">
-                            <span className="text-[11px] md:text-xs font-black uppercase tracking-[0.25em] text-white/95 whitespace-nowrap">
+                          <div key={`${dupIdx}-${i}`} className="flex items-center gap-3 md:gap-6">
+                            <span className="text-[11px] md:text-xs font-black uppercase tracking-[0.2em] md:tracking-[0.25em] text-white/95 whitespace-nowrap">
                               {item.label}
                             </span>
                             <span

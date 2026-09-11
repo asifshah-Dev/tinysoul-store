@@ -13,18 +13,7 @@ interface ProductCardProps {
     description?: string;
     price?: string;
     image?: string | null;
-    variants: {
-      edges: Array<{
-        node: {
-          id: string;
-          price: {
-            amount: string;
-          };
-          availableForSale: boolean;
-          quantityAvailable?: number;
-        };
-      }>;
-    };
+    variants?: any;
     images: {
       edges: Array<{
         node: {
@@ -40,6 +29,39 @@ interface ProductCardProps {
   currencyRate?: number;
 }
 
+// ============================================================
+// PRICE HELPERS
+// ============================================================
+function getFirstVariant(product: any): any {
+  if (!product?.variants) return null;
+  if (Array.isArray(product.variants)) return product.variants[0] || null;
+  if (Array.isArray(product.variants.edges)) return product.variants.edges[0]?.node || null;
+  return null;
+}
+
+function getPrice(product: any): number {
+  const variant = getFirstVariant(product);
+  const raw =
+    (typeof variant?.price === 'string' && variant.price) ||
+    variant?.price?.amount ||
+    product?.price ||
+    '0';
+  const n = parseFloat(raw);
+  return isNaN(n) ? 0 : n;
+}
+
+function getCompareAtPrice(product: any): number {
+  const variant = getFirstVariant(product);
+  const raw =
+    (typeof variant?.compareAtPrice === 'string' && variant.compareAtPrice) ||
+    variant?.compareAtPrice?.amount ||
+    '0';
+  const n = parseFloat(raw);
+  return isNaN(n) ? 0 : n;
+}
+
+// ============================================================
+
 export default function ProductCard({ product, currencySymbol = 'Rs', currencyRate = 1 }: ProductCardProps) {
   const [isImageLoaded, setIsImageLoaded] = useState(false);
   const [isAdding, setIsAdding] = useState(false);
@@ -47,8 +69,17 @@ export default function ProductCard({ product, currencySymbol = 'Rs', currencyRa
   const { addToCart } = useCart();
 
   const image = product.images?.edges?.[0]?.node?.url || product.image || null;
-  const variant = product.variants?.edges?.[0]?.node;
-  const priceAmount = variant?.price?.amount || product.price || '0';
+  const variant = getFirstVariant(product);
+
+  const price = getPrice(product);
+  const compareAt = getCompareAtPrice(product);
+
+  const onSale = compareAt > price && price > 0;
+  const discountPercent = onSale
+    ? Math.round(((compareAt - price) / compareAt) * 100)
+    : 0;
+
+  const cleanTitle = (product.title || '').split('|')[0]?.trim() || product.title;
 
   const handleAddToCart = async (e: React.MouseEvent) => {
     e.preventDefault();
@@ -62,9 +93,10 @@ export default function ProductCard({ product, currencySymbol = 'Rs', currencyRa
       variantId: variant?.id || product.id,
       title: product.title,
       handle: product.handle,
-      price: parseFloat(priceAmount),
+      price: price,
       quantity: 1,
       image: image || '',
+      selectedOptions: [],
     });
 
     if (!result.success) {
@@ -90,7 +122,7 @@ export default function ProductCard({ product, currencySymbol = 'Rs', currencyRa
 
               <Image
                 src={image}
-                alt={product.title}
+                alt={cleanTitle}
                 fill
                 sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
                 className={`
@@ -120,22 +152,37 @@ export default function ProductCard({ product, currencySymbol = 'Rs', currencyRa
               </svg>
             </div>
           )}
+
+          {/* Sale badge — cream tag, top-left */}
+          {onSale && (
+            <div className="absolute top-2 left-2 md:top-3 md:left-3 z-10 px-2 py-0.5 md:px-2.5 md:py-1 rounded text-[9px] md:text-[10px] font-semibold uppercase tracking-[0.15em] text-[#2b2b2b] bg-[#f5e6c8]">
+              -{discountPercent}%
+            </div>
+          )}
         </div>
       </div>
 
-      <div className="mt-4 space-y-1.5">
-        <h3 className="font-medium text-zinc-800 leading-tight group-hover:text-zinc-600 transition-colors duration-300 line-clamp-2">
-          {product.title}
+      <div className="mt-3 md:mt-4 space-y-1 md:space-y-1.5">
+        {/* Title */}
+        <h3 className="text-sm md:text-base font-medium text-zinc-800 leading-snug group-hover:text-zinc-600 transition-colors duration-300 line-clamp-2">
+          {cleanTitle}
         </h3>
 
-        <div className="flex items-center justify-between">
-          <span className="text-lg font-semibold text-zinc-900 tracking-tight">
-            Rs {parseFloat(priceAmount).toLocaleString()}
+        {/* Price row */}
+        <div className="flex items-baseline gap-1.5 md:gap-2 flex-wrap">
+          <span className="text-sm md:text-lg font-semibold text-zinc-900 tracking-tight">
+            {currencySymbol} {price.toLocaleString()}
           </span>
-
-          <span className="text-xs font-medium tracking-wide text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-full">
-            In Stock
-          </span>
+          {onSale && (
+            <>
+              <span className="text-xs md:text-sm text-zinc-400 line-through">
+                {compareAt.toLocaleString()}
+              </span>
+              <span className="text-[10px] md:text-xs font-medium tracking-wide text-[#6f6248] bg-[#fdf6e3] px-2 py-0.5 md:px-2.5 md:py-1 rounded-full whitespace-nowrap">
+                Sale
+              </span>
+            </>
+          )}
         </div>
 
         {errorMsg && (
@@ -147,7 +194,7 @@ export default function ProductCard({ product, currencySymbol = 'Rs', currencyRa
         <button
           onClick={handleAddToCart}
           disabled={isAdding}
-          className={`w-full mt-2 py-2 text-sm font-medium rounded-lg transition-all duration-200 ${
+          className={`w-full mt-2 py-1.5 md:py-2 text-xs md:text-sm font-medium rounded-lg transition-all duration-200 ${
             !isAdding
               ? 'bg-zinc-900 text-white hover:bg-zinc-800 active:scale-[0.98]'
               : 'bg-zinc-200 text-zinc-400 cursor-not-allowed'

@@ -5,6 +5,8 @@ import ProductCard from '@/components/ProductCard';
 import Hero from '@/components/Hero';
 import ProductsClient from '@/components/ProductsClient';
 import CategoryStrip from '@/components/CategoryStrip';
+import CategoryBannerGrid from '@/components/CategoryBannerGrid';
+import PromoStrip from '@/components/PromoStrip';
 
 export default async function Home() {
   const products = await fetchProducts();
@@ -22,7 +24,7 @@ export default async function Home() {
   return (
     <main className="relative min-h-screen bg-cream-50 isolate">
 
-      {/* Blob layer */}
+      {/* Blob layer — unchanged */}
       <div
         aria-hidden
         className="pointer-events-none absolute inset-0 overflow-hidden z-0"
@@ -56,13 +58,43 @@ export default async function Home() {
       {/* Content */}
       <div className="relative z-10">
 
-        {/* Hero */}
+        {/* 1. Existing hero slider — UNCHANGED */}
         <Hero slides={heroSlides} autoPlay={true} interval={5000} />
 
-        {/* ═══ NEW: Category shortcuts ═══ */}
+        {/* 2. NEW — Big banner tiles with child photos */}
+        <CategoryBannerGrid
+          heading="Shop by Collection"
+          banners={[
+            {
+              href: '/products/summer',
+              title: 'Summer',
+              subtitle: 'Cool & bright',
+              image: '/images/banner/cat-summer.jpg',
+              color: '#3ba9e0',
+            },
+            {
+              href: '/products/winter',
+              title: 'Winter',
+              subtitle: 'Warm & cozy',
+              image: '/images/banner/cat-winter.jpg',
+              color: '#a03a20',
+            },
+            {
+              href: '/products/new-arrivals',
+              title: 'New In',
+              subtitle: 'Fresh drops',
+              image: '/images/banner/cat-new.jpg',
+              color: '#5cb85c',
+            },
+          ]}
+        />
+
+        {/* 3. Small category pills — existing (optional, remove if you want) */}
         <CategoryStrip />
 
-        {/* Products Section */}
+       
+
+        {/* 5. Featured Products — existing */}
         <section className="container mx-auto px-4 pt-10 md:pt-12 pb-16">
           <div className="flex items-center justify-between mb-8">
             <div>
@@ -73,11 +105,29 @@ export default async function Home() {
                 Premium kids wear from TinySoul Pakistan
               </p>
             </div>
-           
+            <Link
+              href="/product"
+              className="text-sm font-medium text-cream-700 hover:text-[#F4713A] transition-colors duration-300 flex items-center gap-1"
+            >
+              View All
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+              </svg>
+            </Link>
           </div>
 
           <ProductsClient initialProducts={products} isFeatured={true} />
         </section>
+         {/* 4. NEW — Wide promo strip with child photo */}
+        <PromoStrip
+          image="/images/banner/promo-1.jpg"
+          title="Made for little adventurers"
+          description="Soft, safe, and playful clothing designed in Pakistan for kids who never stop moving."
+          ctaText="Our Story"
+          ctaLink="/about"
+          bgColor="#fae7dd"
+          imageSide="right"
+        />
       </div>
     </main>
   );

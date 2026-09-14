@@ -48,8 +48,8 @@
       {
         "id": "gid://shopify/ProductVariant/53332709441835",
         "title": "Green / 2-3 years",
-        "price": "2299.0",
-        "compareAtPrice": "2799.0",
+        "price": "2499.0",
+        "compareAtPrice": "2800.0",
         "availableForSale": true,
         "selectedOptions": [
           {
@@ -358,8 +358,8 @@
       {
         "id": "gid://shopify/ProductVariant/53332711768363",
         "title": "Green / 1-2 years",
-        "price": "2199.0",
-        "compareAtPrice": "2599.0",
+        "price": "1800.0",
+        "compareAtPrice": "2500.0",
         "availableForSale": true,
         "selectedOptions": [
           {
@@ -686,8 +686,8 @@
       {
         "id": "gid://shopify/ProductVariant/53332720615723",
         "title": "Green / 1-2 years",
-        "price": "2299.0",
-        "compareAtPrice": "2799.0",
+        "price": "2499.0",
+        "compareAtPrice": "2800.0",
         "availableForSale": false,
         "selectedOptions": [
           {
@@ -1036,8 +1036,8 @@
       {
         "id": "gid://shopify/ProductVariant/53332726317355",
         "title": "Orange / 2-3 years",
-        "price": "2399.0",
-        "compareAtPrice": "2799.0",
+        "price": "2499.0",
+        "compareAtPrice": "2800.0",
         "availableForSale": false,
         "selectedOptions": [
           {
@@ -1517,8 +1517,8 @@
       {
         "id": "gid://shopify/ProductVariant/53332727791915",
         "title": "Beige / 2-3 years",
-        "price": "2199.0",
-        "compareAtPrice": "2599.0",
+        "price": "1800.0",
+        "compareAtPrice": "2500.0",
         "availableForSale": true,
         "selectedOptions": [
           {
@@ -1720,8 +1720,8 @@
       {
         "id": "gid://shopify/ProductVariant/53332730380587",
         "title": "White / 2-3 years",
-        "price": "1499.0",
-        "compareAtPrice": "1799.0",
+        "price": "2499.0",
+        "compareAtPrice": "2800.0",
         "availableForSale": true,
         "selectedOptions": [
           {
@@ -2029,8 +2029,8 @@
       {
         "id": "gid://shopify/ProductVariant/53332734837035",
         "title": "Maroon / 1-2 years",
-        "price": "1299.0",
-        "compareAtPrice": "1499.0",
+        "price": "1800.0",
+        "compareAtPrice": "2500.0",
         "availableForSale": true,
         "selectedOptions": [
           {
@@ -2175,8 +2175,8 @@
       {
         "id": "gid://shopify/ProductVariant/53332737229099",
         "title": "Pink / 1-2 years",
-        "price": "1299.0",
-        "compareAtPrice": "1499.0",
+        "price": "2499.0",
+        "compareAtPrice": "2800.0",
         "availableForSale": true,
         "selectedOptions": [
           {
@@ -2323,8 +2323,8 @@
       {
         "id": "gid://shopify/ProductVariant/53332742209835",
         "title": "Blue / 2-3 years",
-        "price": "1499.0",
-        "compareAtPrice": "1799.0",
+        "price": "1800.0",
+        "compareAtPrice": "2500.0",
         "availableForSale": true,
         "selectedOptions": [
           {
@@ -2491,8 +2491,8 @@
       {
         "id": "gid://shopify/ProductVariant/53332743487787",
         "title": "Geometric / 2-3 years",
-        "price": "2399.0",
-        "compareAtPrice": "2799.0",
+        "price": "2499.0",
+        "compareAtPrice": "2800.0",
         "availableForSale": false,
         "selectedOptions": [
           {
@@ -2897,8 +2897,8 @@
       {
         "id": "gid://shopify/ProductVariant/53332746830123",
         "title": "Yellow / 2-3 years",
-        "price": "2299.0",
-        "compareAtPrice": "2799.0",
+        "price": "2499.0",
+        "compareAtPrice": "2800.0",
         "availableForSale": false,
         "selectedOptions": [
           {
@@ -3097,8 +3097,8 @@
       {
         "id": "gid://shopify/ProductVariant/53332747387179",
         "title": "Green / 2-3 years",
-        "price": "2299.0",
-        "compareAtPrice": "2799.0",
+        "price": "2499.0",
+        "compareAtPrice": "2800.0",
         "availableForSale": false,
         "selectedOptions": [
           {
@@ -3297,8 +3297,8 @@
       {
         "id": "gid://shopify/ProductVariant/53332748173611",
         "title": "Purple / 2-3 years",
-        "price": "2299.0",
-        "compareAtPrice": "2799.0",
+        "price": "2499.0",
+        "compareAtPrice": "2800.0",
         "availableForSale": false,
         "selectedOptions": [
           {
@@ -3494,8 +3494,8 @@
       {
         "id": "gid://shopify/ProductVariant/53332753285419",
         "title": "Pink / 2-3 years",
-        "price": "2099.0",
-        "compareAtPrice": "2499.0",
+        "price": "1800.0",
+        "compareAtPrice": "2500.0",
         "availableForSale": false,
         "selectedOptions": [
           {
@@ -3792,8 +3792,8 @@
       {
         "id": "gid://shopify/ProductVariant/53332757283115",
         "title": "Black / 1-2 years",
-        "price": "2099.0",
-        "compareAtPrice": "2499.0",
+        "price": "2499.0",
+        "compareAtPrice": "2800.0",
         "availableForSale": false,
         "selectedOptions": [
           {
@@ -3973,8 +3973,8 @@
       {
         "id": "gid://shopify/ProductVariant/53332758659371",
         "title": "White / 2-3 years",
-        "price": "2099.0",
-        "compareAtPrice": "2415.0",
+        "price": "2499.0",
+        "compareAtPrice": "2800.0",
         "availableForSale": true,
         "selectedOptions": [
           {
@@ -4507,8 +4507,8 @@
       {
         "id": "gid://shopify/ProductVariant/53363505922347",
         "title": "Green / 2-3 years",
-        "price": "1999.0",
-        "compareAtPrice": "2299.0",
+        "price": "1800.0",
+        "compareAtPrice": "2500.0",
         "availableForSale": true,
         "selectedOptions": [
           {
@@ -4695,8 +4695,8 @@
       {
         "id": "gid://shopify/ProductVariant/53363510575403",
         "title": "Green / 2-3 years",
-        "price": "1999.0",
-        "compareAtPrice": "2299.0",
+        "price": "2499.0",
+        "compareAtPrice": "2800.0",
         "availableForSale": false,
         "selectedOptions": [
           {
@@ -4893,8 +4893,8 @@
       {
         "id": "gid://shopify/ProductVariant/53363514573099",
         "title": "White / 2-3 years",
-        "price": "1299.0",
-        "compareAtPrice": "2299.0",
+        "price": "1800.0",
+        "compareAtPrice": "2500.0",
         "availableForSale": true,
         "selectedOptions": [
           {
@@ -5244,8 +5244,8 @@
       {
         "id": "gid://shopify/ProductVariant/53363523748139",
         "title": "White / 2-3 years",
-        "price": "1999.0",
-        "compareAtPrice": "2299.0",
+        "price": "1800.0",
+        "compareAtPrice": "2500.0",
         "availableForSale": false,
         "selectedOptions": [
           {
@@ -5448,8 +5448,8 @@
       {
         "id": "gid://shopify/ProductVariant/53363525484843",
         "title": "Red / 2-3 years",
-        "price": "1999.0",
-        "compareAtPrice": "2299.0",
+        "price": "1800.0",
+        "compareAtPrice": "2500.0",
         "availableForSale": false,
         "selectedOptions": [
           {
@@ -5678,8 +5678,8 @@
       {
         "id": "gid://shopify/ProductVariant/53363534102827",
         "title": "Pink / 2-3 years",
-        "price": "1999.0",
-        "compareAtPrice": "2299.0",
+        "price": "1800.0",
+        "compareAtPrice": "2500.0",
         "availableForSale": false,
         "selectedOptions": [
           {
@@ -5899,7 +5899,7 @@
         "id": "gid://shopify/ProductVariant/53439535415595",
         "title": "Navy / 4-5 years",
         "price": "2499.0",
-        "compareAtPrice": "3399.0",
+        "compareAtPrice": "2800.0",
         "availableForSale": true,
         "selectedOptions": [
           {
@@ -6079,7 +6079,7 @@
         "id": "gid://shopify/ProductVariant/53405093134635",
         "title": "Green / 4-5 years",
         "price": "2499.0",
-        "compareAtPrice": "2799.0",
+        "compareAtPrice": "2800.0",
         "availableForSale": false,
         "selectedOptions": [
           {
@@ -6302,7 +6302,7 @@
         "id": "gid://shopify/ProductVariant/53405096378667",
         "title": "Purple / 4-5 years",
         "price": "2499.0",
-        "compareAtPrice": "2799.0",
+        "compareAtPrice": "2800.0",
         "availableForSale": true,
         "selectedOptions": [
           {
@@ -6522,8 +6522,8 @@
       {
         "id": "gid://shopify/ProductVariant/53433914655019",
         "title": "Black / 4-5 years",
-        "price": "2299.0",
-        "compareAtPrice": "3100.0",
+        "price": "1800.0",
+        "compareAtPrice": "2500.0",
         "availableForSale": true,
         "selectedOptions": [
           {
@@ -6725,8 +6725,8 @@
       {
         "id": "gid://shopify/ProductVariant/53434239942955",
         "title": "Geometric / 4-5 years",
-        "price": "2299.0",
-        "compareAtPrice": "3100.0",
+        "price": "1800.0",
+        "compareAtPrice": "2500.0",
         "availableForSale": true,
         "selectedOptions": [
           {
@@ -7108,8 +7108,8 @@
       {
         "id": "gid://shopify/ProductVariant/53434769211691",
         "title": "Floral / 4-5 years",
-        "price": "2299.0",
-        "compareAtPrice": "3100.0",
+        "price": "1800.0",
+        "compareAtPrice": "2500.0",
         "availableForSale": true,
         "selectedOptions": [
           {
@@ -7125,8 +7125,8 @@
       {
         "id": "gid://shopify/ProductVariant/53434769244459",
         "title": "Floral / 5-6 years",
-        "price": "2299.0",
-        "compareAtPrice": "3100.0",
+        "price": "1800.0",
+        "compareAtPrice": "2500.0",
         "availableForSale": true,
         "selectedOptions": [
           {
@@ -7281,8 +7281,8 @@
       {
         "id": "gid://shopify/ProductVariant/53435038073131",
         "title": "2-3 years",
-        "price": "2299.0",
-        "compareAtPrice": "3100.0",
+        "price": "2499.0",
+        "compareAtPrice": "2800.0",
         "availableForSale": false,
         "selectedOptions": [
           {
@@ -7428,7 +7428,7 @@
         "id": "gid://shopify/ProductVariant/53606304219435",
         "title": "4-5 years / Green",
         "price": "2499.0",
-        "compareAtPrice": "2999.0",
+        "compareAtPrice": "2800.0",
         "availableForSale": true,
         "selectedOptions": [
           {
@@ -7919,7 +7919,7 @@
         "id": "gid://shopify/ProductVariant/54932280574251",
         "title": "4-5 years",
         "price": "2499.0",
-        "compareAtPrice": null,
+        "compareAtPrice": "2800.0",
         "availableForSale": true,
         "selectedOptions": [
           {
@@ -8069,7 +8069,7 @@
         "id": "gid://shopify/ProductVariant/55113380364587",
         "title": "2-3 years / Black",
         "price": "1800.0",
-        "compareAtPrice": null,
+        "compareAtPrice": "2500.0",
         "availableForSale": true,
         "selectedOptions": [
           {
@@ -8357,8 +8357,8 @@
       {
         "id": "gid://shopify/ProductVariant/55159987110187",
         "title": "2-3 years",
-        "price": "2000.0",
-        "compareAtPrice": "2000.0",
+        "price": "1800.0",
+        "compareAtPrice": "2500.0",
         "availableForSale": true,
         "selectedOptions": [
           {
@@ -8370,8 +8370,8 @@
       {
         "id": "gid://shopify/ProductVariant/55159987142955",
         "title": "3-4 years",
-        "price": "2000.0",
-        "compareAtPrice": "2000.0",
+        "price": "1800.0",
+        "compareAtPrice": "2500.0",
         "availableForSale": true,
         "selectedOptions": [
           {
@@ -8496,8 +8496,8 @@
       {
         "id": "gid://shopify/ProductVariant/55165696278827",
         "title": "2-3 years",
-        "price": "1850.0",
-        "compareAtPrice": null,
+        "price": "1800.0",
+        "compareAtPrice": "2500.0",
         "availableForSale": true,
         "selectedOptions": [
           {
@@ -8649,7 +8649,7 @@
         "id": "gid://shopify/ProductVariant/55170296807723",
         "title": "2-3 years",
         "price": "2499.0",
-        "compareAtPrice": null,
+        "compareAtPrice": "2800.0",
         "availableForSale": true,
         "selectedOptions": [
           {
@@ -8822,8 +8822,8 @@
       {
         "id": "gid://shopify/ProductVariant/55173801804075",
         "title": "2-3 years",
-        "price": "1850.0",
-        "compareAtPrice": null,
+        "price": "1800.0",
+        "compareAtPrice": "2500.0",
         "availableForSale": true,
         "selectedOptions": [
           {

@@ -50,7 +50,7 @@
         "title": "Green / 2-3 years",
         "price": "2499.0",
         "compareAtPrice": "2800.0",
-        "availableForSale": true,
+        "availableForSale": false,
         "selectedOptions": [
           {
             "name": "Color",
@@ -67,7 +67,7 @@
         "title": "Green / 3-4 years",
         "price": "2299.0",
         "compareAtPrice": "2799.0",
-        "availableForSale": true,
+        "availableForSale": false,
         "selectedOptions": [
           {
             "name": "Color",
@@ -84,7 +84,7 @@
         "title": "Green / 4-5 years",
         "price": "2299.0",
         "compareAtPrice": "2799.0",
-        "availableForSale": true,
+        "availableForSale": false,
         "selectedOptions": [
           {
             "name": "Color",
@@ -101,7 +101,7 @@
         "title": "Green / 5-6 years",
         "price": "2299.0",
         "compareAtPrice": "2799.0",
-        "availableForSale": true,
+        "availableForSale": false,
         "selectedOptions": [
           {
             "name": "Color",
@@ -118,7 +118,7 @@
         "title": "Green / 7-8 years",
         "price": "2299.0",
         "compareAtPrice": "2799.0",
-        "availableForSale": true,
+        "availableForSale":  false,
         "selectedOptions": [
           {
             "name": "Color",
@@ -135,7 +135,7 @@
         "title": "Green / 9-10 years",
         "price": "2299.0",
         "compareAtPrice": "2799.0",
-        "availableForSale": true,
+        "availableForSale": false,
         "selectedOptions": [
           {
             "name": "Color",
@@ -152,7 +152,7 @@
         "title": "Green / 11-12 years",
         "price": "2299.0",
         "compareAtPrice": "2799.0",
-        "availableForSale": true,
+        "availableForSale": false,
         "selectedOptions": [
           {
             "name": "Color",
@@ -851,7 +851,7 @@
       {
         "id": "gid://shopify/ProductVariant/53332721467691",
         "title": "Purple / 2-3 years",
-        "price": "2399.0",
+        "price": "2200.0",
         "compareAtPrice": "2799.0",
         "availableForSale": true,
         "selectedOptions": [
@@ -1720,7 +1720,7 @@
       {
         "id": "gid://shopify/ProductVariant/53332730380587",
         "title": "White / 2-3 years",
-        "price": "2499.0",
+        "price": "1200.0",
         "compareAtPrice": "2800.0",
         "availableForSale": true,
         "selectedOptions": [
@@ -1883,7 +1883,7 @@
       {
         "id": "gid://shopify/ProductVariant/53332731756843",
         "title": "Multicolor / 1-2 years",
-        "price": "1299.0",
+        "price": "1200.0",
         "compareAtPrice": "1499.0",
         "availableForSale": true,
         "selectedOptions": [
@@ -2029,7 +2029,7 @@
       {
         "id": "gid://shopify/ProductVariant/53332734837035",
         "title": "Maroon / 1-2 years",
-        "price": "1800.0",
+        "price": "1200.0",
         "compareAtPrice": "2500.0",
         "availableForSale": true,
         "selectedOptions": [
@@ -2175,7 +2175,7 @@
       {
         "id": "gid://shopify/ProductVariant/53332737229099",
         "title": "Pink / 1-2 years",
-        "price": "2499.0",
+        "price": "1200.0",
         "compareAtPrice": "2800.0",
         "availableForSale": true,
         "selectedOptions": [
@@ -2323,7 +2323,7 @@
       {
         "id": "gid://shopify/ProductVariant/53332742209835",
         "title": "Blue / 2-3 years",
-        "price": "1800.0",
+        "price": "1200.0",
         "compareAtPrice": "2500.0",
         "availableForSale": true,
         "selectedOptions": [
@@ -2493,7 +2493,7 @@
         "title": "Geometric / 2-3 years",
         "price": "2499.0",
         "compareAtPrice": "2800.0",
-        "availableForSale": false,
+        "availableForSale": true,
         "selectedOptions": [
           {
             "name": "Color",
@@ -3046,206 +3046,7 @@
     "updatedAt": "2026-08-08T00:41:54Z",
     "publishedAt": "2026-08-05T13:09:21Z"
   },
-  {
-    "id": "gid://shopify/Product/10345455452459",
-    "title": "Girls Green Embroidered Cotton Suit – Premium Kids Ethnic Wear | Tiny Soul",
-    "handle": "girls-green-embroidered-cotton-suit",
-    "description": "Elegant Green Embroidered Cotton Suit for Girls Add a fresh and elegant look to your little one's wardrobe with the Girls Green Embroidered Cotton Suit by Tiny Soul. Made from premium soft cotton fabric, this outfit features beautiful floral embroidery on the neckline, sleeves, and front panel, paired with a matching trouser for a complete traditional look. Perfect for Eid, birthdays, weddings, family gatherings, festive celebrations, and everyday wear, this suit combines style with all-day comfort.",
-    "descriptionHtml": "<h3 class=\"PDq2pG_selectionAnchorContainer\">Elegant Green Embroidered Cotton Suit for Girls<span class=\"PDq2pG_selectionAnchor\"></span>\n</h3>\n<p>Add a fresh and elegant look to your little one's wardrobe with the <strong>Girls Green Embroidered Cotton Suit</strong> by <strong>Tiny Soul</strong>. Made from premium soft cotton fabric, this outfit features beautiful floral embroidery on the neckline, sleeves, and front panel, paired with a matching trouser for a complete traditional look.</p>\n<p style=\"text-align: center;\">Perfect for <strong>Eid, birthdays, weddings, family gatherings, festive celebrations, and everyday wear</strong>, this suit combines style with all-day comfort.</p>",
-    "vendor": "Sewing Studio",
-    "productType": "Kids Embroidered Suit",
-    "tags": [
-      "Cotton Suit",
-      "Eid Collection",
-      "Embroidered Dress",
-      "Girls Clothing",
-      "Girls Suit",
-      "Green Suit",
-      "Kids Wear",
-      "Pakistani Kids Fashion",
-      "Tiny Soul",
-      "Traditional Dress"
-    ],
-    "seo": {
-      "title": "Girls Green Embroidered Cotton Suit | Kids Dress | Tiny Soul",
-      "description": "Dress your little princess in this elegant green embroidered cotton suit. Soft, breathable fabric with premium embroidery, perfect for Eid, festive occasions, family events, and casual wear.\nGirls Green Suit\nGreen Embroidered Suit\nKids Cotton Suit\nPakistani Girls Dress\nGirls Traditional Dress\nKids Embroidered Dress\nGreen Kids Outfit\nGirls Eid Dress\nCotton Kids Wear\nTiny Soul Kids Collection\nGirls Party Wear\nGirls Ethnic Wear Pakistan"
-    },
-    "options": [
-      {
-        "id": "gid://shopify/ProductOption/12930492334379",
-        "name": "Color",
-        "values": [
-          "Green"
-        ]
-      },
-      {
-        "id": "gid://shopify/ProductOption/12930492367147",
-        "name": "Size",
-        "values": [
-          "2-3 years",
-          "3-4 years",
-          "4-5 years",
-          "5-6 years",
-          "7-8 years",
-          "9-10 years",
-          "11-12 years",
-          "13-14 years"
-        ]
-      }
-    ],
-    "variants": [
-      {
-        "id": "gid://shopify/ProductVariant/53332747387179",
-        "title": "Green / 2-3 years",
-        "price": "2499.0",
-        "compareAtPrice": "2800.0",
-        "availableForSale": false,
-        "selectedOptions": [
-          {
-            "name": "Color",
-            "value": "Green"
-          },
-          {
-            "name": "Size",
-            "value": "2-3 years"
-          }
-        ]
-      },
-      {
-        "id": "gid://shopify/ProductVariant/53332747419947",
-        "title": "Green / 3-4 years",
-        "price": "2299.0",
-        "compareAtPrice": "2799.0",
-        "availableForSale": false,
-        "selectedOptions": [
-          {
-            "name": "Color",
-            "value": "Green"
-          },
-          {
-            "name": "Size",
-            "value": "3-4 years"
-          }
-        ]
-      },
-      {
-        "id": "gid://shopify/ProductVariant/53332747452715",
-        "title": "Green / 4-5 years",
-        "price": "2299.0",
-        "compareAtPrice": "2799.0",
-        "availableForSale": false,
-        "selectedOptions": [
-          {
-            "name": "Color",
-            "value": "Green"
-          },
-          {
-            "name": "Size",
-            "value": "4-5 years"
-          }
-        ]
-      },
-      {
-        "id": "gid://shopify/ProductVariant/53332747485483",
-        "title": "Green / 5-6 years",
-        "price": "2299.0",
-        "compareAtPrice": "2799.0",
-        "availableForSale": false,
-        "selectedOptions": [
-          {
-            "name": "Color",
-            "value": "Green"
-          },
-          {
-            "name": "Size",
-            "value": "5-6 years"
-          }
-        ]
-      },
-      {
-        "id": "gid://shopify/ProductVariant/53332747518251",
-        "title": "Green / 7-8 years",
-        "price": "2299.0",
-        "compareAtPrice": "2799.0",
-        "availableForSale": false,
-        "selectedOptions": [
-          {
-            "name": "Color",
-            "value": "Green"
-          },
-          {
-            "name": "Size",
-            "value": "7-8 years"
-          }
-        ]
-      },
-      {
-        "id": "gid://shopify/ProductVariant/53332747551019",
-        "title": "Green / 9-10 years",
-        "price": "2299.0",
-        "compareAtPrice": "2799.0",
-        "availableForSale": false,
-        "selectedOptions": [
-          {
-            "name": "Color",
-            "value": "Green"
-          },
-          {
-            "name": "Size",
-            "value": "9-10 years"
-          }
-        ]
-      },
-      {
-        "id": "gid://shopify/ProductVariant/53332747583787",
-        "title": "Green / 11-12 years",
-        "price": "2299.0",
-        "compareAtPrice": "2799.0",
-        "availableForSale": false,
-        "selectedOptions": [
-          {
-            "name": "Color",
-            "value": "Green"
-          },
-          {
-            "name": "Size",
-            "value": "11-12 years"
-          }
-        ]
-      },
-      {
-        "id": "gid://shopify/ProductVariant/53332747616555",
-        "title": "Green / 13-14 years",
-        "price": "2299.0",
-        "compareAtPrice": "2799.0",
-        "availableForSale": false,
-        "selectedOptions": [
-          {
-            "name": "Color",
-            "value": "Green"
-          },
-          {
-            "name": "Size",
-            "value": "13-14 years"
-          }
-        ]
-      }
-    ],
-    "images": [
-      "/images/products/girls-green-embroidered-cotton-0.jpg",
-      "/images/products/girls-green-embroidered-cotton-1.jpg"
-    ],
-    "collections": [
-      {
-        "id": "gid://shopify/Collection/526493647147",
-        "title": "Embroidered Suit",
-        "handle": "separate-frocks"
-      }
-    ],
-    "createdAt": "2026-04-20T13:03:45Z",
-    "updatedAt": "2026-08-08T01:34:38Z",
-    "publishedAt": "2026-08-07T13:34:31Z"
-  },
+  
   {
     "id": "gid://shopify/Product/10345458336043",
     "title": "Girls Purple Embroidered Cotton Suit – Premium Kids Ethnic Wear",
@@ -3297,7 +3098,7 @@
       {
         "id": "gid://shopify/ProductVariant/53332748173611",
         "title": "Purple / 2-3 years",
-        "price": "2499.0",
+        "price": "1200.0",
         "compareAtPrice": "2800.0",
         "availableForSale": false,
         "selectedOptions": [
@@ -3494,7 +3295,7 @@
       {
         "id": "gid://shopify/ProductVariant/53332753285419",
         "title": "Pink / 2-3 years",
-        "price": "1800.0",
+        "price": "1200.0",
         "compareAtPrice": "2500.0",
         "availableForSale": false,
         "selectedOptions": [
@@ -3642,7 +3443,7 @@
       {
         "id": "gid://shopify/ProductVariant/53332756693291",
         "title": "Yellow / 2-3 years",
-        "price": "2099.0",
+        "price": "1200.0",
         "compareAtPrice": "2415.0",
         "availableForSale": false,
         "selectedOptions": [
@@ -3792,9 +3593,9 @@
       {
         "id": "gid://shopify/ProductVariant/53332757283115",
         "title": "Black / 1-2 years",
-        "price": "2499.0",
+        "price": "2000.0",
         "compareAtPrice": "2800.0",
-        "availableForSale": false,
+        "availableForSale": true,
         "selectedOptions": [
           {
             "name": "Color",
@@ -3973,7 +3774,7 @@
       {
         "id": "gid://shopify/ProductVariant/53332758659371",
         "title": "White / 2-3 years",
-        "price": "2499.0",
+        "price": "2000.0",
         "compareAtPrice": "2800.0",
         "availableForSale": true,
         "selectedOptions": [
@@ -4138,7 +3939,7 @@
       {
         "id": "gid://shopify/ProductVariant/53384098251051",
         "title": "Black / 1-2 years",
-        "price": "2199.0",
+        "price": "2000",
         "compareAtPrice": "2599.0",
         "availableForSale": true,
         "selectedOptions": [
@@ -4325,7 +4126,7 @@
       {
         "id": "gid://shopify/ProductVariant/53332725137707",
         "title": "Striped / 3-4 years",
-        "price": "2399.0",
+        "price": "2500.0",
         "compareAtPrice": "2799.0",
         "availableForSale": true,
         "selectedOptions": [
@@ -4509,7 +4310,7 @@
         "title": "Green / 2-3 years",
         "price": "1800.0",
         "compareAtPrice": "2500.0",
-        "availableForSale": true,
+        "availableForSale": false,
         "selectedOptions": [
           {
             "name": "Color",
@@ -4526,7 +4327,7 @@
         "title": "Green / 3-4 years",
         "price": "1999.0",
         "compareAtPrice": "2299.0",
-        "availableForSale": true,
+        "availableForSale": false,
         "selectedOptions": [
           {
             "name": "Color",
@@ -4543,7 +4344,7 @@
         "title": "Green / 4-5 years",
         "price": "1999.0",
         "compareAtPrice": "2299.0",
-        "availableForSale": true,
+        "availableForSale": false,
         "selectedOptions": [
           {
             "name": "Color",
@@ -4560,7 +4361,7 @@
         "title": "Green / 5-6 years",
         "price": "1999.0",
         "compareAtPrice": "2299.0",
-        "availableForSale": true,
+        "availableForSale": false,
         "selectedOptions": [
           {
             "name": "Color",
@@ -4611,7 +4412,7 @@
         "title": "Green / 11-12 years",
         "price": "1999.0",
         "compareAtPrice": "2299.0",
-        "availableForSale": true,
+        "availableForSale": false,
         "selectedOptions": [
           {
             "name": "Color",
@@ -4695,7 +4496,7 @@
       {
         "id": "gid://shopify/ProductVariant/53363510575403",
         "title": "Green / 2-3 years",
-        "price": "2499.0",
+        "price": "1200.0",
         "compareAtPrice": "2800.0",
         "availableForSale": false,
         "selectedOptions": [
@@ -4893,7 +4694,7 @@
       {
         "id": "gid://shopify/ProductVariant/53363514573099",
         "title": "White / 2-3 years",
-        "price": "1800.0",
+        "price": "1200.0",
         "compareAtPrice": "2500.0",
         "availableForSale": true,
         "selectedOptions": [
@@ -5042,7 +4843,7 @@
       {
         "id": "gid://shopify/ProductVariant/53363516637483",
         "title": "Black / 2-3 years",
-        "price": "1299.0",
+        "price": "1200.0",
         "compareAtPrice": "2299.0",
         "availableForSale": false,
         "selectedOptions": [
@@ -5244,7 +5045,7 @@
       {
         "id": "gid://shopify/ProductVariant/53363523748139",
         "title": "White / 2-3 years",
-        "price": "1800.0",
+        "price": "1200.0",
         "compareAtPrice": "2500.0",
         "availableForSale": false,
         "selectedOptions": [
@@ -5448,7 +5249,7 @@
       {
         "id": "gid://shopify/ProductVariant/53363525484843",
         "title": "Red / 2-3 years",
-        "price": "1800.0",
+        "price": "1200.0",
         "compareAtPrice": "2500.0",
         "availableForSale": false,
         "selectedOptions": [
@@ -5898,9 +5699,9 @@
       {
         "id": "gid://shopify/ProductVariant/53439535415595",
         "title": "Navy / 4-5 years",
-        "price": "2499.0",
+        "price": "2000.0",
         "compareAtPrice": "2800.0",
-        "availableForSale": true,
+        "availableForSale": false,
         "selectedOptions": [
           {
             "name": "Color",
@@ -6078,7 +5879,7 @@
       {
         "id": "gid://shopify/ProductVariant/53405093134635",
         "title": "Green / 4-5 years",
-        "price": "2499.0",
+        "price": "2000.0",
         "compareAtPrice": "2800.0",
         "availableForSale": false,
         "selectedOptions": [
@@ -6301,7 +6102,7 @@
       {
         "id": "gid://shopify/ProductVariant/53405096378667",
         "title": "Purple / 4-5 years",
-        "price": "2499.0",
+        "price": "2000.0",
         "compareAtPrice": "2800.0",
         "availableForSale": true,
         "selectedOptions": [
@@ -6928,7 +6729,7 @@
       {
         "id": "gid://shopify/ProductVariant/53434448544043",
         "title": "Green / 4-5 years",
-        "price": "2299.0",
+        "price": "1800.0",
         "compareAtPrice": "3100.0",
         "availableForSale": true,
         "selectedOptions": [
@@ -7281,9 +7082,9 @@
       {
         "id": "gid://shopify/ProductVariant/53435038073131",
         "title": "2-3 years",
-        "price": "2499.0",
+        "price": "2200.0",
         "compareAtPrice": "2800.0",
-        "availableForSale": false,
+        "availableForSale": true,
         "selectedOptions": [
           {
             "name": "Size",
@@ -7384,183 +7185,7 @@
     "updatedAt": "2026-09-05T14:26:00Z",
     "publishedAt": "2026-07-23T11:06:44Z"
   },
-  {
-    "id": "gid://shopify/Product/10396458287403",
-    "title": "Girls Embroidered Eastern Wear 2 Piece Suit",
-    "handle": "girls-embroidered-eastern-wear-2-piece-suit",
-    "description": "Add elegance to your little one’s wardrobe with this beautifully embroidered 2-piece eastern outfit. Designed with delicate detailing on the neckline, sleeves, and hem, this outfit offers a graceful traditional look with all-day comfort. The straight shirt paired with matching trousers creates a stylish and timeless ensemble perfect for festive gatherings, family events, and casual wear. Crafted from soft and breathable fabric for a comfortable fit.",
-    "descriptionHtml": "<p>Add elegance to your little one’s wardrobe with this beautifully embroidered 2-piece eastern outfit. Designed with delicate detailing on the neckline, sleeves, and hem, this outfit offers a graceful traditional look with all-day comfort. The straight shirt paired with matching trousers creates a stylish and timeless ensemble perfect for festive gatherings, family events, and casual wear. Crafted from soft and breathable fabric for a comfortable fit.</p>",
-    "vendor": "Suiting",
-    "productType": "Kids Suiting",
-    "tags": [
-      "Dress",
-      "kids Suit",
-      "printed suit"
-    ],
-    "seo": {
-      "title": "",
-      "description": ""
-    },
-    "options": [
-      {
-        "id": "gid://shopify/ProductOption/12992507609387",
-        "name": "Size",
-        "values": [
-          "4-5 years",
-          "5-6 years",
-          "7-8 years",
-          "9-10 years",
-          "11-12 years",
-          "13-14 years",
-          "15 16 year"
-        ]
-      },
-      {
-        "id": "gid://shopify/ProductOption/12992507642155",
-        "name": "Color",
-        "values": [
-          "Green"
-        ]
-      }
-    ],
-    "variants": [
-      {
-        "id": "gid://shopify/ProductVariant/53606304219435",
-        "title": "4-5 years / Green",
-        "price": "2499.0",
-        "compareAtPrice": "2800.0",
-        "availableForSale": true,
-        "selectedOptions": [
-          {
-            "name": "Size",
-            "value": "4-5 years"
-          },
-          {
-            "name": "Color",
-            "value": "Green"
-          }
-        ]
-      },
-      {
-        "id": "gid://shopify/ProductVariant/53606304252203",
-        "title": "5-6 years / Green",
-        "price": "2499.0",
-        "compareAtPrice": "2999.0",
-        "availableForSale": true,
-        "selectedOptions": [
-          {
-            "name": "Size",
-            "value": "5-6 years"
-          },
-          {
-            "name": "Color",
-            "value": "Green"
-          }
-        ]
-      },
-      {
-        "id": "gid://shopify/ProductVariant/53606304284971",
-        "title": "7-8 years / Green",
-        "price": "2499.0",
-        "compareAtPrice": "2999.0",
-        "availableForSale": true,
-        "selectedOptions": [
-          {
-            "name": "Size",
-            "value": "7-8 years"
-          },
-          {
-            "name": "Color",
-            "value": "Green"
-          }
-        ]
-      },
-      {
-        "id": "gid://shopify/ProductVariant/53606304317739",
-        "title": "9-10 years / Green",
-        "price": "2499.0",
-        "compareAtPrice": "2999.0",
-        "availableForSale": true,
-        "selectedOptions": [
-          {
-            "name": "Size",
-            "value": "9-10 years"
-          },
-          {
-            "name": "Color",
-            "value": "Green"
-          }
-        ]
-      },
-      {
-        "id": "gid://shopify/ProductVariant/53606304350507",
-        "title": "11-12 years / Green",
-        "price": "2499.0",
-        "compareAtPrice": "2999.0",
-        "availableForSale": true,
-        "selectedOptions": [
-          {
-            "name": "Size",
-            "value": "11-12 years"
-          },
-          {
-            "name": "Color",
-            "value": "Green"
-          }
-        ]
-      },
-      {
-        "id": "gid://shopify/ProductVariant/53606304383275",
-        "title": "13-14 years / Green",
-        "price": "2499.0",
-        "compareAtPrice": "2999.0",
-        "availableForSale": true,
-        "selectedOptions": [
-          {
-            "name": "Size",
-            "value": "13-14 years"
-          },
-          {
-            "name": "Color",
-            "value": "Green"
-          }
-        ]
-      },
-      {
-        "id": "gid://shopify/ProductVariant/53606304416043",
-        "title": "15 16 year / Green",
-        "price": "2499.0",
-        "compareAtPrice": "2999.0",
-        "availableForSale": true,
-        "selectedOptions": [
-          {
-            "name": "Size",
-            "value": "15 16 year"
-          },
-          {
-            "name": "Color",
-            "value": "Green"
-          }
-        ]
-      }
-    ],
-    "images": [],
-    "collections": [
-      {
-        "id": "gid://shopify/Collection/526493647147",
-        "title": "Embroidered Suit",
-        "handle": "separate-frocks"
-      },
-      {
-        "id": "gid://shopify/Collection/528212164907",
-        "title": "Best Seller",
-        "handle": "eid-discount"
-      }
-    ],
-    "createdAt": "2026-05-21T21:49:33Z",
-    "updatedAt": "2026-08-13T11:04:27Z",
-    "publishedAt": "2026-05-21T21:49:34Z"
-  },
+ 
   {
     "id": "gid://shopify/Product/10396458909995",
     "title": "Girls Premium Embroidered 2 Piece Eastern Outfit",
@@ -7600,7 +7225,7 @@
       {
         "id": "gid://shopify/ProductVariant/53606305759531",
         "title": "Yellow / 4-5 years",
-        "price": "2499.0",
+        "price": "2200.0",
         "compareAtPrice": "2999.0",
         "availableForSale": true,
         "selectedOptions": [
@@ -7773,7 +7398,7 @@
       {
         "id": "gid://shopify/ProductVariant/53606311657771",
         "title": "4-5 years",
-        "price": "2499.0",
+        "price": "1800.0",
         "compareAtPrice": "2999.0",
         "availableForSale": true,
         "selectedOptions": [
@@ -7918,7 +7543,7 @@
       {
         "id": "gid://shopify/ProductVariant/54932280574251",
         "title": "4-5 years",
-        "price": "2499.0",
+        "price": "2200.0",
         "compareAtPrice": "2800.0",
         "availableForSale": true,
         "selectedOptions": [
@@ -8648,7 +8273,7 @@
       {
         "id": "gid://shopify/ProductVariant/55170296807723",
         "title": "2-3 years",
-        "price": "2499.0",
+        "price": "2399.0",
         "compareAtPrice": "2800.0",
         "availableForSale": true,
         "selectedOptions": [

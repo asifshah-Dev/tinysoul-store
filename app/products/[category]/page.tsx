@@ -67,6 +67,17 @@ function isOnSale(product: any): boolean {
 }
 
 // ============================================================
+// AVAILABILITY HELPER
+// Returns false only when the first variant is explicitly
+// marked availableForSale === false. Missing field => available.
+// ============================================================
+function isSoldOut(product: any): boolean {
+  const variant = getFirstVariant(product);
+  if (!variant) return false;
+  return variant.availableForSale === false;
+}
+
+// ============================================================
 
 export default async function CategoryPage({ params }: PageProps) {
   const { category } = await params;
@@ -103,6 +114,10 @@ export default async function CategoryPage({ params }: PageProps) {
     });
   }
 
+  // Count how many of the filtered products are still available
+  const soldOutCount = filtered.filter((p: any) => isSoldOut(p)).length;
+  const availableCount = filtered.length - soldOutCount;
+
   return (
     <main className="pt-24 md:pt-28">
       <div className="container mx-auto px-4 py-8">
@@ -111,7 +126,12 @@ export default async function CategoryPage({ params }: PageProps) {
             {label}
           </h1>
           <p className="mt-2 text-gray-500">
-            {filtered.length} products available
+            {availableCount} products available
+            {soldOutCount > 0 && (
+              <span className="text-gray-400">
+                {' '}· {soldOutCount} sold out
+              </span>
+            )}
           </p>
         </div>
         <ProductsClient initialProducts={filtered} />

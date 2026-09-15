@@ -5,7 +5,7 @@ import { useCart } from '@/context/CartContext';
 import Link from 'next/link';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
-import { ShoppingBag, Trash2, Minus, Plus, Send, Phone, User, MessageCircle, Check } from 'lucide-react';
+import { ShoppingBag, Trash2, Minus, Plus, Phone, User, Mail, MessageCircle, Check } from 'lucide-react';
 
 export default function CheckoutPage() {
   const { cart, cartCount, cartTotal, removeFromCart, updateQuantity, clearCart } = useCart();
@@ -14,10 +14,8 @@ export default function CheckoutPage() {
   const [customerAddress, setCustomerAddress] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [orderPlaced, setOrderPlaced] = useState(false);
-  const [orderSummary, setOrderSummary] = useState('');
   const [phoneError, setPhoneError] = useState('');
-
-  const OWNER_PHONE = '923024380139';
+  const [submitError, setSubmitError] = useState('');
 
   const countryCodes = [
     { code: '+92', country: 'Pakistan', flag: '🇵🇰' },
@@ -75,39 +73,37 @@ export default function CheckoutPage() {
     setPhoneError(error);
   };
 
-  // ═══ WhatsApp message with color + size ═══
   const generateOrderSummary = () => {
-    let summary = '🛍️ *New Order Received!*%0A';
-    summary += `%0A👤 *Customer Details*%0A`;
-    summary += `Name: ${customerName}%0A`;
-    summary += `Phone: ${selectedCountryCode} ${customerPhone}%0A`;
-    summary += `Address: ${customerAddress || 'Not provided'}%0A`;
-    summary += `%0A📦 *Order Details*%0A`;
+    let summary = 'New Order Received!\n\n';
+    summary += 'Customer Details\n';
+    summary += `Name: ${customerName}\n`;
+    summary += `Phone: ${selectedCountryCode} ${customerPhone}\n`;
+    summary += `Address: ${customerAddress || 'Not provided'}\n\n`;
+    summary += 'Order Details\n';
 
     cart.forEach((item: any, index: number) => {
-      summary += `%0A${index + 1}. ${item.title?.split('|')[0]?.trim() || item.title}%0A`;
+      summary += `\n${index + 1}. ${item.title?.split('|')[0]?.trim() || item.title}\n`;
 
       if (Array.isArray(item.selectedOptions) && item.selectedOptions.length > 0) {
         const optionLine = item.selectedOptions
           .filter((opt: any) => opt?.name && opt?.value)
           .map((opt: any) => `${opt.name}: ${opt.value}`)
           .join(' | ');
-        if (optionLine) summary += `   ${optionLine}%0A`;
+        if (optionLine) summary += `   ${optionLine}\n`;
       }
 
-      summary += `   Quantity: ${item.quantity}%0A`;
-      summary += `   Price: Rs ${(item.price * item.quantity).toLocaleString()}%0A`;
+      summary += `   Quantity: ${item.quantity}\n`;
+      summary += `   Price: Rs ${(item.price * item.quantity).toLocaleString()}\n`;
     });
 
-    summary += `%0A💰 *Total: Rs ${cartTotal.toLocaleString()}*%0A`;
-    summary += `%0A📦 *Total Items: ${cartCount}*%0A`;
-    summary += `%0A---%0A`;
-    summary += `📅 ${new Date().toLocaleString()}`;
+    summary += `\nTotal: Rs ${cartTotal.toLocaleString()}\n`;
+    summary += `Total Items: ${cartCount}\n`;
+    summary += `\n${new Date().toLocaleString()}`;
 
     return summary;
   };
 
-  const handleWhatsAppCheckout = () => {
+  const handleEmailCheckout = async () => {
     if (!customerName || !customerPhone) {
       alert('Please fill in your name and phone number');
       return;
@@ -117,13 +113,33 @@ export default function CheckoutPage() {
       return;
     }
     setIsSubmitting(true);
+    setSubmitError('');
     const message = generateOrderSummary();
-    const whatsappUrl = `https://wa.me/${OWNER_PHONE}?text=${message}`;
-    window.open(whatsappUrl, '_blank');
-    setOrderSummary(message);
-    setOrderPlaced(true);
-    setIsSubmitting(false);
-    setTimeout(() => clearCart(), 2000);
+
+    try {
+      const response = await fetch('https://formsubmit.co/ajax/tinysoul10@gmail.com', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+        body: JSON.stringify({
+          _subject: `New order from ${customerName}`,
+          _template: 'table',
+          customer_name: customerName,
+          customer_phone: `${selectedCountryCode} ${customerPhone}`,
+          delivery_address: customerAddress || 'Not provided',
+          order_details: message,
+          total: `Rs ${cartTotal.toLocaleString()}`,
+        }),
+      });
+
+      if (!response.ok) throw new Error('Email service request failed');
+
+      setOrderPlaced(true);
+      clearCart();
+    } catch {
+      setSubmitError('Unable to send your order right now. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   if (cart.length === 0 && !orderPlaced) {
@@ -238,14 +254,14 @@ export default function CheckoutPage() {
                     <MessageCircle className="w-5 h-5 text-teal-600 flex-shrink-0 mt-0.5" />
                     <div>
                       <p className="text-sm text-teal-800">
-                        Your order will be sent to the shop owner via WhatsApp. They will confirm your order shortly.
+                        Your order will be emailed to the shop owner. They will confirm your order shortly.
                       </p>
                     </div>
                   </div>
                 </div>
 
                 <button
-                  onClick={handleWhatsAppCheckout}
+                  onClick={handleEmailCheckout}
                   disabled={isSubmitting || !customerName || !customerPhone || !!phoneError}
                   className={`w-full py-4 rounded-xl font-semibold text-lg text-white transition-all flex items-center justify-center gap-2 ${
                     !isSubmitting && customerName && customerPhone && !phoneError
@@ -254,9 +270,10 @@ export default function CheckoutPage() {
                   }`}
                   style={{ color: 'white !important' }}
                 >
-                  <Send className="w-5 h-5" />
-                  {isSubmitting ? 'Sending...' : 'Send Order via WhatsApp'}
+                  <Mail className="w-5 h-5" />
+                  {isSubmitting ? 'Sending...' : 'Send Order via Email'}
                 </button>
+                {submitError && <p className="text-sm text-red-500 text-center">{submitError}</p>}
               </div>
             </div>
           </div>
@@ -284,7 +301,7 @@ export default function CheckoutPage() {
               </div>
               <h3 className="text-2xl font-bold text-gray-900">Order Sent! 🎉</h3>
               <p className="text-gray-600 mt-2">
-                Your order has been sent to the shop owner via WhatsApp.
+                Your order has been emailed to the shop owner.
                 They will contact you shortly to confirm.
               </p>
               <Link

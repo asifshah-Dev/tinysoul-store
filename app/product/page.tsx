@@ -9,6 +9,18 @@ export const metadata = {
 export default async function ProductsPage() {
   const products = await fetchProducts();
 
+  // Count products where the first variant is sold out (availableForSale === false)
+  const availableCount = products.filter((p: any) => {
+    const variants = p?.variants;
+    let firstVariant: any = null;
+
+    if (Array.isArray(variants)) firstVariant = variants[0] || null;
+    else if (Array.isArray(variants?.edges)) firstVariant = variants.edges[0]?.node || null;
+
+    if (!firstVariant) return true; // no variant info => treat as available
+    return firstVariant.availableForSale !== false;
+  }).length;
+
   return (
     <main className="pt-24 md:pt-28">
       <div className="container mx-auto px-4 py-8">
@@ -17,7 +29,13 @@ export default async function ProductsPage() {
             All Products
           </h1>
           <p className="mt-2 text-gray-500">
-            {products.length} products available
+            {availableCount} products available
+            {availableCount !== products.length && (
+              <span className="text-gray-400">
+                {' '}
+                ({products.length - availableCount} sold out)
+              </span>
+            )}
           </p>
         </div>
         <ProductsClient initialProducts={products} />

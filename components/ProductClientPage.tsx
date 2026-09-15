@@ -51,6 +51,12 @@ function getOption(variant: any, name: string): string {
   return opt?.value || '';
 }
 
+// ═══ AVAILABILITY ═══
+function isVariantAvailable(variant: any): boolean {
+  if (!variant) return false;
+  return variant.availableForSale !== false;
+}
+
 // ============================================================
 // BgRemovedImage
 // ============================================================
@@ -144,7 +150,7 @@ export default function ProductClientPage({ handle }: ProductClientProps) {
         if (data) {
           const variants = getVariants(data);
           const first =
-            variants.find((v: any) => v?.availableForSale !== false) ||
+            variants.find((v: any) => isVariantAvailable(v)) ||
             variants[0];
           if (first) {
             setSelectedColor(getOption(first, 'color'));
@@ -180,6 +186,35 @@ export default function ProductClientPage({ handle }: ProductClientProps) {
     return sizes;
   }, [variants]);
 
+  // ═══ Which colors/sizes have at least one available variant? ═══
+  const availableColors = useMemo(() => {
+    const set = new Set<string>();
+    variants.forEach((v: any) => {
+      if (isVariantAvailable(v)) {
+        const c = getOption(v, 'color');
+        if (c) set.add(c);
+      }
+    });
+    return set;
+  }, [variants]);
+
+  const availableSizes = useMemo(() => {
+    const set = new Set<string>();
+    variants.forEach((v: any) => {
+      if (isVariantAvailable(v)) {
+        const s = getOption(v, 'size');
+        if (s) set.add(s);
+      }
+    });
+    return set;
+  }, [variants]);
+
+  // ═══ Is the whole product sold out? ═══
+  const allSoldOut = useMemo(() => {
+    if (variants.length === 0) return false;
+    return variants.every((v: any) => !isVariantAvailable(v));
+  }, [variants]);
+
   const selectedVariant = useMemo(() => {
     let match = variants.find((v: any) => {
       const c = getOption(v, 'color');
@@ -194,6 +229,26 @@ export default function ProductClientPage({ handle }: ProductClientProps) {
     }
     return match || variants[0] || null;
   }, [variants, selectedColor, selectedSize]);
+
+  const selectedAvailable = isVariantAvailable(selectedVariant);
+  const soldOut = !selectedAvailable;
+
+  // ═══ Auto-correct: if current combo is sold out, pick an available one ═══
+  useEffect(() => {
+    if (!selectedVariant) return;
+    if (isVariantAvailable(selectedVariant)) return;
+
+    const fallback = variants.find(
+      (v: any) =>
+        isVariantAvailable(v) &&
+        (!selectedColor || getOption(v, 'color') === selectedColor)
+    ) || variants.find((v: any) => isVariantAvailable(v));
+
+    if (fallback) {
+      setSelectedColor(getOption(fallback, 'color'));
+      setSelectedSize(getOption(fallback, 'size'));
+    }
+  }, [selectedVariant, variants, selectedColor]);
 
   const allImages = useMemo(
     () => product?.images?.edges?.map((edge: any) => edge.node.url) || [],
@@ -223,7 +278,6 @@ export default function ProductClientPage({ handle }: ProductClientProps) {
     setSelectedImage(0);
   }, [selectedColor]);
 
-  // Reset zoom when image or color changes
   useEffect(() => {
     setIsZoomed(false);
     setZoomOrigin({ x: 50, y: 50 });
@@ -235,11 +289,8 @@ export default function ProductClientPage({ handle }: ProductClientProps) {
     product?.image ||
     '';
 
-  // ═══ Click on image: zoom or re-zoom ═══
   const handleImageClick = (e: React.MouseEvent<HTMLDivElement>) => {
-    // Stop propagation if the click came from the reset pill
     if ((e.target as HTMLElement).closest('[data-zoom-reset]')) return;
-
     if (!imageContainerRef.current) return;
 
     const rect = imageContainerRef.current.getBoundingClientRect();
@@ -249,12 +300,10 @@ export default function ProductClientPage({ handle }: ProductClientProps) {
     const clampedX = Math.max(0, Math.min(100, x));
     const clampedY = Math.max(0, Math.min(100, y));
 
-    // Always set the new origin and keep it zoomed
     setZoomOrigin({ x: clampedX, y: clampedY });
     setIsZoomed(true);
   };
 
-  // ═══ Explicit reset — only via the pill ═══
   const handleResetZoom = (e: React.MouseEvent) => {
     e.stopPropagation();
     setIsZoomed(false);
@@ -262,7 +311,7 @@ export default function ProductClientPage({ handle }: ProductClientProps) {
   };
 
   const handleAddToCart = () => {
-    if (isAdding) return;
+    if (isAdding || soldOut) return;
 
     setIsAdding(true);
 
@@ -358,7 +407,13 @@ export default function ProductClientPage({ handle }: ProductClientProps) {
                 </div>
               )}
 
-              {/* Zoom hint — visible when NOT zoomed */}
+              {/* ═══ Red Sold Out label over the image ═══ */}
+              {soldOut && (
+                <div className="absolute top-3 left-3 md:top-4 md:left-4 z-20 px-3 py-1 md:px-4 md:py-1.5 rounded text-[10px] md:text-xs font-bold uppercase tracking-[0.15em] text-white bg-red-600 shadow-md">
+                  Sold Out
+                </div>
+              )}
+
               {!isZoomed && mainImage && (
                 <div className="pointer-events-none absolute bottom-3 right-3 md:bottom-4 md:right-4 z-10 flex items-center gap-1.5 px-2.5 py-1.5 rounded-full bg-white/80 backdrop-blur-sm text-[10px] md:text-xs font-semibold text-[#6f6248] shadow-sm">
                   <ZoomIn className="w-3.5 h-3.5" />
@@ -367,7 +422,6 @@ export default function ProductClientPage({ handle }: ProductClientProps) {
                 </div>
               )}
 
-              {/* Reset button — only when zoomed, and it's the ONLY way out */}
               {isZoomed && (
                 <button
                   data-zoom-reset
@@ -410,6 +464,13 @@ export default function ProductClientPage({ handle }: ProductClientProps) {
               {product.title.split('|')[0]?.trim() || product.title}
             </h1>
 
+            {/* ═══ Sold-out inline label (below title) ═══ */}
+            {(soldOut || allSoldOut) && (
+              <div className="mt-3 inline-block px-3 py-1 rounded text-[11px] font-semibold uppercase tracking-[0.15em] text-white bg-red-600">
+                Sold Out
+              </div>
+            )}
+
             <div className="mt-3 md:mt-4 flex items-center gap-2 md:gap-3 flex-wrap">
               <span className="text-2xl md:text-3xl font-bold text-teal-600">
                 Rs {totalPrice.toLocaleString()}
@@ -431,6 +492,7 @@ export default function ProductClientPage({ handle }: ProductClientProps) {
               )}
             </div>
 
+            {/* ═══ Colors ═══ */}
             {colorOptions.length > 0 && (
               <div className="mt-5 md:mt-6">
                 <label className="text-xs md:text-sm font-medium text-gray-700 block mb-2">
@@ -439,12 +501,16 @@ export default function ProductClientPage({ handle }: ProductClientProps) {
                 <div className="flex flex-wrap gap-2">
                   {colorOptions.map((color) => {
                     const isSelected = selectedColor === color;
+                    const isAvailable = availableColors.has(color);
                     return (
                       <button
                         key={color}
-                        onClick={() => setSelectedColor(color)}
+                        disabled={!isAvailable}
+                        onClick={() => isAvailable && setSelectedColor(color)}
                         className={`px-3 py-1.5 md:px-4 md:py-2 rounded-lg text-xs md:text-sm font-medium border-2 transition-all ${
-                          isSelected
+                          !isAvailable
+                            ? 'border-gray-200 text-gray-300 line-through cursor-not-allowed opacity-60'
+                            : isSelected
                             ? 'border-teal-600 bg-teal-50 text-teal-700'
                             : 'border-gray-200 text-gray-700 hover:border-teal-400 hover:text-teal-700'
                         }`}
@@ -457,6 +523,7 @@ export default function ProductClientPage({ handle }: ProductClientProps) {
               </div>
             )}
 
+            {/* ═══ Sizes ═══ */}
             {sizeOptions.length > 0 && (
               <div className="mt-5 md:mt-6">
                 <label className="text-xs md:text-sm font-medium text-gray-700 block mb-2">
@@ -465,12 +532,16 @@ export default function ProductClientPage({ handle }: ProductClientProps) {
                 <div className="flex flex-wrap gap-2">
                   {sizeOptions.map((size) => {
                     const isSelected = selectedSize === size;
+                    const isAvailable = availableSizes.has(size);
                     return (
                       <button
                         key={size}
-                        onClick={() => setSelectedSize(size)}
+                        disabled={!isAvailable}
+                        onClick={() => isAvailable && setSelectedSize(size)}
                         className={`px-3 py-1.5 md:px-4 md:py-2 rounded-lg text-xs md:text-sm font-medium border-2 transition-all ${
-                          isSelected
+                          !isAvailable
+                            ? 'border-gray-200 text-gray-300 line-through cursor-not-allowed opacity-60'
+                            : isSelected
                             ? 'border-teal-600 bg-teal-50 text-teal-700'
                             : 'border-gray-200 text-gray-700 hover:border-teal-400 hover:text-teal-700'
                         }`}
@@ -494,27 +565,30 @@ export default function ProductClientPage({ handle }: ProductClientProps) {
               </div>
             )}
 
-            <div className="mt-5 md:mt-6">
-              <label className="text-xs md:text-sm font-medium text-gray-700 block mb-2">
-                Quantity
-              </label>
-              <div className="flex items-center gap-3">
-                <button
-                  onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                  className="p-2 rounded-lg border border-gray-300 hover:bg-gray-50 transition-colors"
-                  disabled={quantity <= 1}
-                >
-                  <Minus className="w-4 h-4 text-gray-600" />
-                </button>
-                <span className="w-12 text-center font-medium text-gray-800">{quantity}</span>
-                <button
-                  onClick={() => setQuantity(quantity + 1)}
-                  className="p-2 rounded-lg border border-gray-300 hover:bg-gray-50 transition-colors"
-                >
-                  <Plus className="w-4 h-4 text-gray-600" />
-                </button>
+            {/* ═══ Quantity (hidden when sold out) ═══ */}
+            {!soldOut && (
+              <div className="mt-5 md:mt-6">
+                <label className="text-xs md:text-sm font-medium text-gray-700 block mb-2">
+                  Quantity
+                </label>
+                <div className="flex items-center gap-3">
+                  <button
+                    onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                    className="p-2 rounded-lg border border-gray-300 hover:bg-gray-50 transition-colors"
+                    disabled={quantity <= 1}
+                  >
+                    <Minus className="w-4 h-4 text-gray-600" />
+                  </button>
+                  <span className="w-12 text-center font-medium text-gray-800">{quantity}</span>
+                  <button
+                    onClick={() => setQuantity(quantity + 1)}
+                    className="p-2 rounded-lg border border-gray-300 hover:bg-gray-50 transition-colors"
+                  >
+                    <Plus className="w-4 h-4 text-gray-600" />
+                  </button>
+                </div>
               </div>
-            </div>
+            )}
 
             <div className="mt-5 md:mt-6">
               {errorMsg && (
@@ -524,20 +598,24 @@ export default function ProductClientPage({ handle }: ProductClientProps) {
               )}
               <button
                 onClick={handleAddToCart}
-                disabled={isAdding}
-                className={`w-full py-3 md:py-4 rounded-xl font-semibold text-base md:text-lg text-white transition-all flex items-center justify-center gap-2 ${
-                  !isAdding
-                    ? 'bg-black hover:bg-gray-800 shadow-lg'
-                    : 'bg-gray-400 cursor-not-allowed'
+                disabled={isAdding || soldOut}
+                className={`w-full py-3 md:py-4 rounded-xl font-semibold text-base md:text-lg transition-all flex items-center justify-center gap-2 ${
+                  soldOut
+                    ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                    : !isAdding
+                    ? 'bg-black hover:bg-gray-800 text-white shadow-lg'
+                    : 'bg-gray-400 text-white cursor-not-allowed'
                 }`}
               >
                 <ShoppingBag className="w-5 h-5" />
-                {isAdding ? 'Adding...' : 'Add to Cart'}
+                {soldOut ? 'Sold Out' : isAdding ? 'Adding...' : 'Add to Cart'}
               </button>
 
-              <p className="text-xs md:text-sm text-gray-400 text-center mt-3">
-                Free shipping on orders over Rs 5000
-              </p>
+              {!soldOut && (
+                <p className="text-xs md:text-sm text-gray-400 text-center mt-3">
+                  Free shipping on orders over Rs 5000
+                </p>
+              )}
             </div>
           </div>
         </div>

@@ -61,20 +61,38 @@ function getCompareAtPrice(product: any): number {
 }
 
 // ============================================================
+// AVAILABILITY — sold out only if first variant is explicitly false
+// ============================================================
+function isSoldOut(product: any): boolean {
+  const variant = getFirstVariant(product);
+  if (!variant) return false;
+  return variant.availableForSale === false;
+}
+
+// ============================================================
 
 export default function ProductCard({ product, currencySymbol = 'Rs', currencyRate = 1 }: ProductCardProps) {
   const [isImageLoaded, setIsImageLoaded] = useState(false);
+  const [isSecondImageLoaded, setIsSecondImageLoaded] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
   const [isAdding, setIsAdding] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
   const { addToCart } = useCart();
 
-  const image = product.images?.edges?.[0]?.node?.url || product.image || null;
+  // ═══ Grab up to 2 images ═══
+  const images = product.images?.edges?.map((e) => e.node.url) || [];
+  const primaryImage = images[0] || product.image || null;
+  const secondaryImage = images[1] || null;
+  const hasSecondary = !!secondaryImage;
+
   const variant = getFirstVariant(product);
 
   const price = getPrice(product);
   const compareAt = getCompareAtPrice(product);
 
-  const onSale = compareAt > price && price > 0;
+  const soldOut = isSoldOut(product);
+
+  const onSale = !soldOut && compareAt > price && price > 0;
   const discountPercent = onSale
     ? Math.round(((compareAt - price) / compareAt) * 100)
     : 0;
@@ -85,7 +103,7 @@ export default function ProductCard({ product, currencySymbol = 'Rs', currencyRa
     e.preventDefault();
     e.stopPropagation();
 
-    if (isAdding) return;
+    if (isAdding || soldOut) return;
 
     setIsAdding(true);
 
@@ -95,7 +113,7 @@ export default function ProductCard({ product, currencySymbol = 'Rs', currencyRa
       handle: product.handle,
       price: price,
       quantity: 1,
-      image: image || '',
+      image: primaryImage || '',
       selectedOptions: [],
     });
 
@@ -111,17 +129,21 @@ export default function ProductCard({ product, currencySymbol = 'Rs', currencyRa
     <Link
       href={`/product/${product.handle}`}
       className="group relative block"
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
     >
       <div className="relative overflow-hidden rounded-xl bg-zinc-100">
         <div className="aspect-[3/4] relative">
-          {image ? (
+          {primaryImage ? (
             <>
-              {!isImageLoaded && (
+              {/* ═══ Loading skeleton ═══ */}
+              {(!isImageLoaded || (isHovered && hasSecondary && !isSecondImageLoaded)) && (
                 <div className="absolute inset-0 bg-gradient-to-r from-zinc-200 via-zinc-100 to-zinc-200 animate-pulse" />
               )}
 
+              {/* ═══ Primary image ═══ */}
               <Image
-                src={image}
+                src={primaryImage}
                 alt={cleanTitle}
                 fill
                 sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
@@ -129,11 +151,30 @@ export default function ProductCard({ product, currencySymbol = 'Rs', currencyRa
                   object-cover transition-all duration-700 ease-out
                   group-hover:scale-105
                   ${isImageLoaded ? 'opacity-100' : 'opacity-0'}
+                  ${isHovered && hasSecondary ? 'opacity-0' : ''}
                 `}
                 onLoad={() => setIsImageLoaded(true)}
                 priority={false}
                 quality={85}
               />
+
+              {/* ═══ Secondary image (fades in on hover) ═══ */}
+              {hasSecondary && (
+                <Image
+                  src={secondaryImage!}
+                  alt={`${cleanTitle} — alternate view`}
+                  fill
+                  sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                  className={`
+                    object-cover absolute inset-0 transition-all duration-700 ease-out
+                    group-hover:scale-105
+                    ${isHovered && isSecondImageLoaded ? 'opacity-100' : 'opacity-0'}
+                  `}
+                  onLoad={() => setIsSecondImageLoaded(true)}
+                  priority={false}
+                  quality={85}
+                />
+              )}
             </>
           ) : (
             <div className="absolute inset-0 flex items-center justify-center bg-zinc-100">
@@ -153,10 +194,17 @@ export default function ProductCard({ product, currencySymbol = 'Rs', currencyRa
             </div>
           )}
 
-          {/* Sale badge — cream tag, top-left */}
-          {onSale && (
+          {/* Sale badge — top-left (hidden when sold out) */}
+          {onSale && !soldOut && (
             <div className="absolute top-2 left-2 md:top-3 md:left-3 z-10 px-2 py-0.5 md:px-2.5 md:py-1 rounded text-[9px] md:text-[10px] font-semibold uppercase tracking-[0.15em] text-[#2b2b2b] bg-[#f5e6c8]">
               -{discountPercent}%
+            </div>
+          )}
+
+          {/* Sold Out — red label, top-left */}
+          {soldOut && (
+            <div className="absolute top-2 left-2 md:top-3 md:left-3 z-10 px-2 py-0.5 md:px-2.5 md:py-1 rounded text-[9px] md:text-[10px] font-semibold uppercase tracking-[0.15em] text-white bg-red-600">
+              Sold Out
             </div>
           )}
         </div>
@@ -193,14 +241,16 @@ export default function ProductCard({ product, currencySymbol = 'Rs', currencyRa
 
         <button
           onClick={handleAddToCart}
-          disabled={isAdding}
+          disabled={isAdding || soldOut}
           className={`w-full mt-2 py-1.5 md:py-2 text-xs md:text-sm font-medium rounded-lg transition-all duration-200 ${
-            !isAdding
+            soldOut
+              ? 'bg-zinc-100 text-zinc-400 cursor-not-allowed border border-zinc-200'
+              : !isAdding
               ? 'bg-zinc-900 text-white hover:bg-zinc-800 active:scale-[0.98]'
               : 'bg-zinc-200 text-zinc-400 cursor-not-allowed'
           }`}
         >
-          {isAdding ? 'Adding...' : 'Add to Cart'}
+          {soldOut ? 'Sold Out' : isAdding ? 'Adding...' : 'Add to Cart'}
         </button>
       </div>
     </Link>

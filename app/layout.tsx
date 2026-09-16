@@ -7,6 +7,7 @@ import Navbar from '@/components/Navbar';
 import CartDrawer from '@/components/CartDrawer';
 import LoadingScreen from '@/components/LoadingScreen';
 import CustomCursor from '@/components/CustomCursor';
+import Chatbot from '@/components/Chatbot';
 import './globals.css';
 
 export const metadata: Metadata = {
@@ -29,11 +30,10 @@ export default function RootLayout({
             <Navbar />
             {children}
             <CartDrawer />
+            <Chatbot />
 
             {/* ============================================================
-                FOOTER — same cream gradient as the rest of the page,
-                no top border, no top margin. Flows seamlessly from
-                the section above it.
+                FOOTER — cream gradient flowing seamlessly from content
                 ============================================================ */}
             <footer
               className="relative mt-0"
@@ -125,7 +125,7 @@ export default function RootLayout({
                   </div>
                 </div>
 
-                {/* Bottom bar — subtle divider is preserved but lighter */}
+                {/* Bottom bar */}
                 <div className="mt-12 pt-8 border-t border-[#1c130d]/8 flex flex-col md:flex-row items-center justify-between gap-4">
                   <p className="text-xs text-[#948362]">
                     © {new Date().getFullYear()} Tiny Soul. All rights reserved.

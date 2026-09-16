@@ -2,29 +2,21 @@
 import Link from 'next/link';
 import { fetchProducts } from '@/lib/data-source';
 import ProductCard from '@/components/ProductCard';
-import Hero from '@/components/Hero';
 import ProductsClient from '@/components/ProductsClient';
 import CategoryStrip from '@/components/CategoryStrip';
 import CategoryBannerGrid from '@/components/CategoryBannerGrid';
+import SaleBanners from '@/components/SaleBanners';
 import PromoStrip from '@/components/PromoStrip';
 
 export default async function Home() {
   const products = await fetchProducts();
 
-  const heroSlides = products.slice(0, 5).map((product: any) => ({
-    id: product.id,
-    title: product.title?.split('|')[0]?.trim() || product.title || 'New Arrival',
-    subtitle: 'Product',
-    description: product.description?.substring(0, 120) || '',
-    image: product.images?.edges?.[0]?.node?.url || product.image || '',
-    link: `/product/${product.handle}`,
-    buttonText: 'View Product',
-  }));
-
   return (
-    <main className="relative min-h-screen bg-cream-50 isolate">
-
-      {/* Blob layer — unchanged */}
+    <main
+      className="relative min-h-screen isolate"
+      style={{ backgroundColor: '#FDF6E3' }}
+    >
+      {/* Blob layer */}
       <div
         aria-hidden
         className="pointer-events-none absolute inset-0 overflow-hidden z-0"
@@ -57,11 +49,8 @@ export default async function Home() {
 
       {/* Content */}
       <div className="relative z-10">
+        <SaleBanners />
 
-        {/* 1. Existing hero slider — UNCHANGED */}
-        <Hero slides={heroSlides} autoPlay={true} interval={5000} />
-
-        {/* 2. NEW — Big banner tiles with child photos */}
         <CategoryBannerGrid
           heading="Shop by Collection"
           banners={[
@@ -89,13 +78,10 @@ export default async function Home() {
           ]}
         />
 
-        {/* 3. Small category pills — existing (optional, remove if you want) */}
         <CategoryStrip />
 
-       
-
-        {/* 5. Featured Products — existing */}
-        <section className="container mx-auto px-4 pt-10 md:pt-12 pb-16">
+        {/* Featured Products — flows straight into the footer now */}
+        <section className="container mx-auto px-4 pt-10 md:pt-12 pb-4">
           <div className="flex items-center justify-between mb-8">
             <div>
               <h2 className="text-2xl md:text-3xl font-bold text-cream-900 tracking-tight">
@@ -118,16 +104,6 @@ export default async function Home() {
 
           <ProductsClient initialProducts={products} isFeatured={true} />
         </section>
-         {/* 4. NEW — Wide promo strip with child photo */}
-        <PromoStrip
-          image="/images/banner/promo-1.jpg"
-          title="Made for little adventurers"
-          description="Soft, safe, and playful clothing designed in Pakistan for kids who never stop moving."
-          ctaText="Our Story"
-          ctaLink="/about"
-          bgColor="#fae7dd"
-          imageSide="right"
-        />
       </div>
     </main>
   );

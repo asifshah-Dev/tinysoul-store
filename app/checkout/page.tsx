@@ -5,10 +5,38 @@ import { useCart } from '@/context/CartContext';
 import Link from 'next/link';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
-import { ShoppingBag, Trash2, Minus, Plus, Phone, User, Mail, MessageCircle, Check } from 'lucide-react';
+import {
+  ShoppingBag,
+  Trash2,
+  Minus,
+  Plus,
+  Phone,
+  User,
+  Mail,
+  MessageCircle,
+  Check,
+} from 'lucide-react';
+
+const PALETTE = {
+  cream: '#FDF6E3',
+  creamDeep: '#F5E6C8',
+  teal: '#0F766E',
+  tealSoft: '#E6F4F1',
+  coral: '#F4713A',
+  ink: '#1c130d',
+  muted: '#6f6248',
+  mutedLight: '#948362',
+};
 
 export default function CheckoutPage() {
-  const { cart, cartCount, cartTotal, removeFromCart, updateQuantity, clearCart } = useCart();
+  const {
+    cart,
+    cartCount,
+    cartTotal,
+    removeFromCart,
+    updateQuantity,
+    clearCart,
+  } = useCart();
   const [customerName, setCustomerName] = useState('');
   const [customerPhone, setCustomerPhone] = useState('');
   const [customerAddress, setCustomerAddress] = useState('');
@@ -45,7 +73,7 @@ export default function CheckoutPage() {
   const getPhoneError = (phone: string, countryCode: string) => {
     const cleanPhone = phone.replace(/[\s\-\(\)]/g, '');
     if (!cleanPhone) return '';
-    const country = countryCodes.find(c => c.code === countryCode);
+    const country = countryCodes.find((c) => c.code === countryCode);
     let requiredLength = 10;
     if (countryCode === '+971' || countryCode === '+966') requiredLength = 9;
     if (countryCode === '+92') requiredLength = 10;
@@ -117,26 +145,34 @@ export default function CheckoutPage() {
     const message = generateOrderSummary();
 
     try {
-      const response = await fetch('https://formsubmit.co/ajax/tinysoul10@gmail.com', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-        body: JSON.stringify({
-          _subject: `New order from ${customerName}`,
-          _template: 'table',
-          customer_name: customerName,
-          customer_phone: `${selectedCountryCode} ${customerPhone}`,
-          delivery_address: customerAddress || 'Not provided',
-          order_details: message,
-          total: `Rs ${cartTotal.toLocaleString()}`,
-        }),
-      });
+      const response = await fetch(
+        'https://formsubmit.co/ajax/tinysoul10@gmail.com',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Accept: 'application/json',
+          },
+          body: JSON.stringify({
+            _subject: `New order from ${customerName}`,
+            _template: 'table',
+            customer_name: customerName,
+            customer_phone: `${selectedCountryCode} ${customerPhone}`,
+            delivery_address: customerAddress || 'Not provided',
+            order_details: message,
+            total: `Rs ${cartTotal.toLocaleString()}`,
+          }),
+        }
+      );
 
       if (!response.ok) throw new Error('Email service request failed');
 
       setOrderPlaced(true);
       clearCart();
     } catch {
-      setSubmitError('Unable to send your order right now. Please try again.');
+      setSubmitError(
+        'Unable to send your order right now. Please try again.'
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -144,14 +180,27 @@ export default function CheckoutPage() {
 
   if (cart.length === 0 && !orderPlaced) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center px-4 pt-24 md:pt-28">
-        <ShoppingBag className="w-20 h-20 text-gray-300 mb-4" />
-        <h2 className="text-2xl font-bold text-gray-800">Your cart is empty</h2>
-        <p className="text-gray-500 mt-2">Looks like you haven't added any items yet.</p>
+      <div
+        className="min-h-screen flex flex-col items-center justify-center px-4 pt-20 md:pt-24"
+        style={{ backgroundColor: PALETTE.cream }}
+      >
+        <ShoppingBag
+          className="w-20 h-20 mb-4"
+          style={{ color: PALETTE.creamDeep }}
+        />
+        <h2 className="text-2xl font-bold" style={{ color: PALETTE.ink }}>
+          Your cart is empty
+        </h2>
+        <p className="mt-2" style={{ color: PALETTE.muted }}>
+          Looks like you haven&apos;t added any items yet.
+        </p>
         <Link
           href="/product"
-          className="mt-6 px-8 py-3 bg-teal-600 text-white hover:bg-teal-700 transition-colors"
-          style={{ color: 'white !important' }}
+          className="mt-6 px-8 py-3 rounded-lg transition-all hover:scale-105 active:scale-95 shadow-md font-medium"
+          style={{
+            backgroundColor: PALETTE.teal,
+            color: '#ffffff',
+          }}
         >
           Start Shopping
         </Link>
@@ -159,12 +208,17 @@ export default function CheckoutPage() {
     );
   }
 
-  const country = countryCodes.find(c => c.code === selectedCountryCode);
+  const country = countryCodes.find((c) => c.code === selectedCountryCode);
 
   return (
-    <div className="min-h-screen pt-24 md:pt-28 py-8">
+    <div
+      className="min-h-screen pt-20 md:pt-24 py-8"
+      style={{ backgroundColor: PALETTE.cream }}
+    >
       <div className="container mx-auto px-4">
-        <h1 className="text-3xl font-bold text-gray-900 mb-8">Checkout</h1>
+        <h1 className="text-3xl font-bold mb-8" style={{ color: PALETTE.ink }}>
+          Checkout
+        </h1>
 
         <div className="lg:hidden mb-8">
           <OrderSummaryCard
@@ -178,33 +232,77 @@ export default function CheckoutPage() {
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           <div className="order-2 lg:order-1">
-            <div className="bg-white rounded-2xl p-6 border border-gray-100">
-              <h2 className="text-xl font-semibold text-gray-800 mb-6">Customer Details</h2>
+            <div
+              className="rounded-2xl p-6 border"
+              style={{
+                backgroundColor: PALETTE.cream,
+                borderColor: PALETTE.creamDeep,
+              }}
+            >
+              <h2
+                className="text-xl font-semibold mb-6"
+                style={{ color: PALETTE.ink }}
+              >
+                Customer Details
+              </h2>
 
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Full Name *</label>
+                  <label
+                    className="block text-sm font-medium mb-1"
+                    style={{ color: PALETTE.ink }}
+                  >
+                    Full Name *
+                  </label>
                   <div className="relative">
-                    <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                    <User
+                      className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5"
+                      style={{ color: PALETTE.mutedLight }}
+                    />
                     <input
                       type="text"
                       value={customerName}
                       onChange={(e) => setCustomerName(e.target.value)}
                       placeholder="Enter your full name"
-                      className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent text-gray-800"
+                      className="w-full pl-10 pr-4 py-3 rounded-lg focus:outline-none focus:ring-2 transition-all"
+                      style={{
+                        backgroundColor: PALETTE.cream,
+                        borderWidth: '1px',
+                        borderColor: PALETTE.creamDeep,
+                        color: PALETTE.ink,
+                      }}
+                      onFocus={(e) => {
+                        e.target.style.borderColor = PALETTE.teal;
+                        e.target.style.boxShadow = `0 0 0 3px ${PALETTE.teal}20`;
+                      }}
+                      onBlur={(e) => {
+                        e.target.style.borderColor = PALETTE.creamDeep;
+                        e.target.style.boxShadow = 'none';
+                      }}
                       required
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Phone Number *</label>
+                  <label
+                    className="block text-sm font-medium mb-1"
+                    style={{ color: PALETTE.ink }}
+                  >
+                    Phone Number *
+                  </label>
                   <div className="flex gap-2">
                     <div className="relative w-36 flex-shrink-0">
                       <select
                         value={selectedCountryCode}
                         onChange={(e) => handleCountryChange(e.target.value)}
-                        className="w-full h-full px-3 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent appearance-none bg-white text-gray-800 text-sm"
+                        className="w-full h-full px-3 py-3 rounded-lg appearance-none text-sm focus:outline-none"
+                        style={{
+                          backgroundColor: PALETTE.cream,
+                          borderWidth: '1px',
+                          borderColor: PALETTE.creamDeep,
+                          color: PALETTE.ink,
+                        }}
                       >
                         {countryCodes.map((c) => (
                           <option key={c.code} value={c.code}>
@@ -215,15 +313,34 @@ export default function CheckoutPage() {
                     </div>
 
                     <div className="flex-1 relative">
-                      <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                      <Phone
+                        className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5"
+                        style={{ color: PALETTE.mutedLight }}
+                      />
                       <input
                         type="tel"
                         value={customerPhone}
                         onChange={handlePhoneChange}
                         placeholder={`${selectedCountryCode} 3XXXXXXXXX`}
-                        className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent text-gray-800 ${
-                          phoneError ? 'border-red-500' : 'border-gray-300'
-                        }`}
+                        className="w-full pl-10 pr-4 py-3 rounded-lg focus:outline-none transition-all"
+                        style={{
+                          backgroundColor: PALETTE.cream,
+                          borderWidth: '1px',
+                          borderColor: phoneError ? '#ef4444' : PALETTE.creamDeep,
+                          color: PALETTE.ink,
+                        }}
+                        onFocus={(e) => {
+                          if (!phoneError) {
+                            e.target.style.borderColor = PALETTE.teal;
+                            e.target.style.boxShadow = `0 0 0 3px ${PALETTE.teal}20`;
+                          }
+                        }}
+                        onBlur={(e) => {
+                          e.target.style.borderColor = phoneError
+                            ? '#ef4444'
+                            : PALETTE.creamDeep;
+                          e.target.style.boxShadow = 'none';
+                        }}
                         maxLength={15}
                         required
                       />
@@ -232,29 +349,69 @@ export default function CheckoutPage() {
                   {phoneError ? (
                     <p className="text-sm text-red-500 mt-1">{phoneError}</p>
                   ) : (
-                    <p className="text-xs text-gray-400 mt-1">
-                      {country?.flag} {country?.country} - Enter {selectedCountryCode === '+92' ? '10' : selectedCountryCode === '+971' || selectedCountryCode === '+966' ? '9' : '10'} digits
+                    <p
+                      className="text-xs mt-1"
+                      style={{ color: PALETTE.mutedLight }}
+                    >
+                      {country?.flag} {country?.country} - Enter{' '}
+                      {selectedCountryCode === '+92'
+                        ? '10'
+                        : selectedCountryCode === '+971' ||
+                          selectedCountryCode === '+966'
+                        ? '9'
+                        : '10'}{' '}
+                      digits
                     </p>
                   )}
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Delivery Address</label>
+                  <label
+                    className="block text-sm font-medium mb-1"
+                    style={{ color: PALETTE.ink }}
+                  >
+                    Delivery Address
+                  </label>
                   <textarea
                     value={customerAddress}
                     onChange={(e) => setCustomerAddress(e.target.value)}
                     placeholder="Enter your complete delivery address"
                     rows={3}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent resize-none text-gray-800"
+                    className="w-full px-4 py-3 rounded-lg focus:outline-none resize-none transition-all"
+                    style={{
+                      backgroundColor: PALETTE.cream,
+                      borderWidth: '1px',
+                      borderColor: PALETTE.creamDeep,
+                      color: PALETTE.ink,
+                    }}
+                    onFocus={(e) => {
+                      e.target.style.borderColor = PALETTE.teal;
+                      e.target.style.boxShadow = `0 0 0 3px ${PALETTE.teal}20`;
+                    }}
+                    onBlur={(e) => {
+                      e.target.style.borderColor = PALETTE.creamDeep;
+                      e.target.style.boxShadow = 'none';
+                    }}
                   />
                 </div>
 
-                <div className="bg-teal-50 rounded-lg p-4 border border-teal-100">
+                {/* Info pill */}
+                <div
+                  className="rounded-lg p-4 border"
+                  style={{
+                    backgroundColor: PALETTE.tealSoft,
+                    borderColor: '#B8E0D9',
+                  }}
+                >
                   <div className="flex items-start gap-3">
-                    <MessageCircle className="w-5 h-5 text-teal-600 flex-shrink-0 mt-0.5" />
+                    <MessageCircle
+                      className="w-5 h-5 flex-shrink-0 mt-0.5"
+                      style={{ color: PALETTE.teal }}
+                    />
                     <div>
-                      <p className="text-sm text-teal-800">
-                        Your order will be emailed to the shop owner. They will confirm your order shortly.
+                      <p className="text-sm" style={{ color: PALETTE.teal }}>
+                        Your order will be emailed to the shop owner. They will
+                        confirm your order shortly.
                       </p>
                     </div>
                   </div>
@@ -262,18 +419,36 @@ export default function CheckoutPage() {
 
                 <button
                   onClick={handleEmailCheckout}
-                  disabled={isSubmitting || !customerName || !customerPhone || !!phoneError}
-                  className={`w-full py-4 rounded-xl font-semibold text-lg text-white transition-all flex items-center justify-center gap-2 ${
-                    !isSubmitting && customerName && customerPhone && !phoneError
-                      ? 'bg-green-600 hover:bg-green-700 shadow-lg'
-                      : 'bg-gray-300 cursor-not-allowed'
-                  }`}
-                  style={{ color: 'white !important' }}
+                  disabled={
+                    isSubmitting ||
+                    !customerName ||
+                    !customerPhone ||
+                    !!phoneError
+                  }
+                  className="w-full py-4 rounded-xl font-semibold text-lg transition-all flex items-center justify-center gap-2 shadow-md hover:scale-[1.01] active:scale-[0.99]"
+                  style={{
+                    backgroundColor:
+                      !isSubmitting && customerName && customerPhone && !phoneError
+                        ? '#16a34a'
+                        : PALETTE.creamDeep,
+                    color:
+                      !isSubmitting && customerName && customerPhone && !phoneError
+                        ? '#ffffff'
+                        : PALETTE.mutedLight,
+                    cursor:
+                      !isSubmitting && customerName && customerPhone && !phoneError
+                        ? 'pointer'
+                        : 'not-allowed',
+                  }}
                 >
                   <Mail className="w-5 h-5" />
                   {isSubmitting ? 'Sending...' : 'Send Order via Email'}
                 </button>
-                {submitError && <p className="text-sm text-red-500 text-center">{submitError}</p>}
+                {submitError && (
+                  <p className="text-sm text-red-500 text-center">
+                    {submitError}
+                  </p>
+                )}
               </div>
             </div>
           </div>
@@ -295,19 +470,33 @@ export default function CheckoutPage() {
             animate={{ opacity: 1, y: 0 }}
             className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 px-4"
           >
-            <div className="bg-white rounded-2xl p-8 max-w-lg w-full text-center">
-              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <div
+              className="rounded-2xl p-8 max-w-lg w-full text-center"
+              style={{ backgroundColor: PALETTE.cream }}
+            >
+              <div
+                className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4"
+                style={{ backgroundColor: '#DCFCE7' }}
+              >
                 <Check className="w-8 h-8 text-green-600" />
               </div>
-              <h3 className="text-2xl font-bold text-gray-900">Order Sent! 🎉</h3>
-              <p className="text-gray-600 mt-2">
-                Your order has been emailed to the shop owner.
-                They will contact you shortly to confirm.
+              <h3
+                className="text-2xl font-bold"
+                style={{ color: PALETTE.ink }}
+              >
+                Order Sent! 🎉
+              </h3>
+              <p className="mt-2" style={{ color: PALETTE.muted }}>
+                Your order has been emailed to the shop owner. They will contact
+                you shortly to confirm.
               </p>
               <Link
                 href="/"
-                className="block mt-6 px-8 py-3 bg-teal-600 text-white hover:bg-teal-700 transition-colors"
-                style={{ color: 'white !important' }}
+                className="block mt-6 px-8 py-3 rounded-lg font-medium transition-all hover:scale-105 active:scale-95 shadow-md"
+                style={{
+                  backgroundColor: PALETTE.teal,
+                  color: '#ffffff',
+                }}
               >
                 Continue Shopping
               </Link>
@@ -319,45 +508,88 @@ export default function CheckoutPage() {
   );
 }
 
-function OrderSummaryCard({ cart, cartCount, cartTotal, removeFromCart, updateQuantity }: any) {
+function OrderSummaryCard({
+  cart,
+  cartCount,
+  cartTotal,
+  removeFromCart,
+  updateQuantity,
+}: any) {
   return (
-    <div className="bg-white rounded-2xl p-6 border border-gray-100 sticky top-24">
-      <h2 className="text-xl font-semibold text-gray-800 mb-6">Order Summary</h2>
+    <div
+      className="rounded-2xl p-6 border sticky top-24"
+      style={{
+        backgroundColor: PALETTE.cream,
+        borderColor: PALETTE.creamDeep,
+      }}
+    >
+      <h2
+        className="text-xl font-semibold mb-6"
+        style={{ color: PALETTE.ink }}
+      >
+        Order Summary
+      </h2>
 
       <div className="space-y-4 max-h-[400px] overflow-y-auto">
         {cart.map((item: any) => (
-          <div key={item.id} className="flex gap-4 py-4 border-b border-gray-100">
-            <div className="relative w-16 h-16 flex-shrink-0 bg-gray-50 rounded-lg overflow-hidden">
+          <div
+            key={item.id}
+            className="flex gap-4 py-4 border-b"
+            style={{ borderColor: PALETTE.creamDeep }}
+          >
+            <div
+              className="relative w-16 h-16 flex-shrink-0 rounded-lg overflow-hidden"
+              style={{ backgroundColor: '#FAF7F2' }}
+            >
               {item.image ? (
-                <Image src={item.image} alt={item.title} fill className="object-cover" />
+                <Image
+                  src={item.image}
+                  alt={item.title}
+                  fill
+                  className="object-cover"
+                />
               ) : (
-                <div className="flex items-center justify-center h-full text-gray-400">
+                <div
+                  className="flex items-center justify-center h-full"
+                  style={{ color: PALETTE.muted }}
+                >
                   <ShoppingBag className="w-6 h-6" />
                 </div>
               )}
             </div>
             <div className="flex-1 min-w-0">
-              <h4 className="font-medium text-gray-800 text-sm line-clamp-1">
+              <h4
+                className="font-medium text-sm line-clamp-1"
+                style={{ color: PALETTE.ink }}
+              >
                 {item.title?.split('|')[0]?.trim() || item.title}
               </h4>
 
-              {Array.isArray(item.selectedOptions) && item.selectedOptions.length > 0 && (
-                <div className="flex flex-wrap gap-1 mt-1">
-                  {item.selectedOptions
-                    .filter((opt: any) => opt?.name && opt?.value)
-                    .map((opt: any, i: number) => (
-                      <span
-                        key={i}
-                        className="text-[10px] font-bold uppercase tracking-wider text-[#6f6248] bg-[#fdf6e3] px-2 py-0.5 rounded-full"
-                      >
-                        {opt.value}
-                      </span>
-                    ))}
-                </div>
-              )}
+              {Array.isArray(item.selectedOptions) &&
+                item.selectedOptions.length > 0 && (
+                  <div className="flex flex-wrap gap-1 mt-1">
+                    {item.selectedOptions
+                      .filter((opt: any) => opt?.name && opt?.value)
+                      .map((opt: any, i: number) => (
+                        <span
+                          key={i}
+                          className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full"
+                          style={{
+                            color: PALETTE.muted,
+                            backgroundColor: PALETTE.creamDeep,
+                          }}
+                        >
+                          {opt.value}
+                        </span>
+                      ))}
+                  </div>
+                )}
 
               <div className="flex items-center justify-between mt-2">
-                <span className="text-sm font-semibold text-teal-600">
+                <span
+                  className="text-sm font-semibold"
+                  style={{ color: PALETTE.teal }}
+                >
                   Rs {(item.price * item.quantity).toLocaleString()}
                 </span>
                 <div className="flex items-center gap-2">
@@ -369,20 +601,31 @@ function OrderSummaryCard({ cart, cartCount, cartTotal, removeFromCart, updateQu
                         removeFromCart(item.id);
                       }
                     }}
-                    className="p-1 rounded hover:bg-gray-100 transition-colors"
+                    className="p-1 rounded transition-colors hover:bg-[#F5E6C8]"
                   >
-                    <Minus className="w-4 h-4 text-gray-500" />
+                    <Minus
+                      className="w-4 h-4"
+                      style={{ color: PALETTE.muted }}
+                    />
                   </button>
-                  <span className="w-6 text-center text-sm font-medium text-gray-800">{item.quantity}</span>
+                  <span
+                    className="w-6 text-center text-sm font-medium"
+                    style={{ color: PALETTE.ink }}
+                  >
+                    {item.quantity}
+                  </span>
                   <button
                     onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                    className="p-1 rounded hover:bg-gray-100 transition-colors"
+                    className="p-1 rounded transition-colors hover:bg-[#F5E6C8]"
                   >
-                    <Plus className="w-4 h-4 text-gray-500" />
+                    <Plus
+                      className="w-4 h-4"
+                      style={{ color: PALETTE.muted }}
+                    />
                   </button>
                   <button
                     onClick={() => removeFromCart(item.id)}
-                    className="p-1 rounded hover:bg-red-50 transition-colors ml-1"
+                    className="p-1 rounded transition-colors hover:bg-red-50 ml-1"
                   >
                     <Trash2 className="w-4 h-4 text-red-500" />
                   </button>
@@ -393,18 +636,30 @@ function OrderSummaryCard({ cart, cartCount, cartTotal, removeFromCart, updateQu
         ))}
       </div>
 
-      <div className="mt-6 pt-6 border-t border-gray-200">
+      <div
+        className="mt-6 pt-6 border-t"
+        style={{ borderColor: PALETTE.creamDeep }}
+      >
         <div className="flex justify-between text-lg font-bold">
-          <span className="text-gray-800">Total</span>
-          <span className="text-teal-600">Rs {cartTotal.toLocaleString()}</span>
+          <span style={{ color: PALETTE.ink }}>Total</span>
+          <span style={{ color: PALETTE.teal }}>
+            Rs {cartTotal.toLocaleString()}
+          </span>
         </div>
-        <div className="flex justify-between text-sm text-gray-500 mt-1">
+        <div
+          className="flex justify-between text-sm mt-1"
+          style={{ color: PALETTE.muted }}
+        >
           <span>Items</span>
           <span>{cartCount}</span>
         </div>
       </div>
 
-      <Link href="/cart" className="block text-center text-sm text-teal-600 hover:text-teal-700 mt-4">
+      <Link
+        href="/cart"
+        className="block text-center text-sm mt-4 transition-colors hover:opacity-80"
+        style={{ color: PALETTE.teal }}
+      >
         ← Back to Cart
       </Link>
     </div>

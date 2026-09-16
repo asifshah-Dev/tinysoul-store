@@ -27,7 +27,6 @@ export default function Navbar() {
   const menuButtonRef = useRef<HTMLButtonElement>(null);
   const searchButtonRef = useRef<HTMLButtonElement>(null);
 
-  // ── Product index for search (fetched once, cached in memory) ──
   const [products, setProducts] = useState<SearchProduct[]>([]);
   const [productsLoaded, setProductsLoaded] = useState(false);
 
@@ -56,7 +55,6 @@ export default function Navbar() {
     };
   }, []);
 
-  // ── Live search results (memoized so it only recomputes on query/products change) ──
   const searchResults = useMemo(() => {
     const q = searchQuery.trim().toLowerCase();
     if (q.length < 2) return [];
@@ -114,13 +112,11 @@ export default function Navbar() {
     const q = searchQuery.trim();
     if (!q) return;
 
-    // If there's an exact or top result, go straight to it
     if (searchResults.length > 0) {
       window.location.href = `/product/${searchResults[0].handle}`;
       return;
     }
 
-    // Otherwise go to the products list page
     window.location.href = `/products?q=${encodeURIComponent(q)}`;
     setIsSearchOpen(false);
     setSearchQuery('');
@@ -170,17 +166,24 @@ export default function Navbar() {
 
   return (
     <>
-      {/* ============ HEADER ============ */}
-      <header className="fixed top-0 left-0 right-0 z-50 px-4 pt-4 bg-white/20 backdrop-blur-md border-b border-white/30">
+      {/* ============ HEADER — taller, bigger logo ============ */}
+      <header
+        className="fixed top-0 left-0 right-0 z-50 border-0 shadow-none"
+        style={{
+          backgroundColor: '#FDF6E3',
+          borderBottom: 'none',
+          boxShadow: 'none',
+        }}
+      >
         <div className="container mx-auto max-w-7xl">
-          <div className="flex items-center justify-between h-16 md:h-20 px-4 md:px-6">
+          <div className="relative flex items-center justify-between h-20 md:h-28 px-4 md:px-6">
 
             {/* LEFT: Menu + Search */}
-            <div className="flex items-center gap-1 md:gap-2">
+            <div className="flex items-center gap-1 md:gap-2 z-10">
               <button
                 ref={menuButtonRef}
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
-                className="p-2 rounded-full text-[#2b2b2b] hover:bg-white/70 hover:text-[#F4713A] transition-all"
+                className="p-2 rounded-full text-[#1c130d] hover:bg-[#F5E6C8]/60 hover:text-[#F4713A] transition-all"
                 aria-label="Toggle menu"
               >
                 {isMenuOpen ? <X className="w-6 h-6 md:w-7 md:h-7" /> : <Menu className="w-6 h-6 md:w-7 md:h-7" />}
@@ -189,30 +192,33 @@ export default function Navbar() {
               <button
                 ref={searchButtonRef}
                 onClick={() => setIsSearchOpen(!isSearchOpen)}
-                className="p-2 rounded-full text-[#2b2b2b] hover:bg-white/70 hover:text-[#29ABE2] transition-all"
+                className="p-2 rounded-full text-[#1c130d] hover:bg-[#F5E6C8]/60 hover:text-[#29ABE2] transition-all"
                 aria-label="Search"
               >
                 <Search className="w-6 h-6 md:w-7 md:h-7" />
               </button>
             </div>
 
-            {/* CENTER: Logo */}
-            <Link href="/" className="absolute left-1/2 -translate-x-1/2">
+            {/* CENTER: Logo — bigger now */}
+            <Link
+              href="/"
+              className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center justify-center"
+            >
               <Image
-                src="/logo.png"
-                alt="Tiny Soul"
-                width={500}
-                height={150}
-                className="h-20 md:h-32 w-auto object-contain"
-                priority
-              />
+  src="/logo.png"
+  alt="Tiny Soul"
+  width={500}
+  height={150}
+  className="h-24 md:h-32 lg:h-36 w-auto object-contain"
+  priority
+/>
             </Link>
 
             {/* RIGHT: Cart + Checkout icons */}
-            <div className="flex items-center gap-1 md:gap-2">
+            <div className="flex items-center gap-1 md:gap-2 z-10">
               <Link
                 href="/cart"
-                className="relative p-2 rounded-full text-[#2b2b2b] hover:bg-white/70 hover:text-[#FF6B9D] transition-all"
+                className="relative p-2 rounded-full text-[#1c130d] hover:bg-[#F5E6C8]/60 hover:text-[#FF6B9D] transition-all"
                 aria-label="Cart"
               >
                 <ShoppingBag className="w-6 h-6 md:w-7 md:h-7" />
@@ -231,7 +237,7 @@ export default function Navbar() {
 
               <Link
                 href="/checkout"
-                className="p-2 rounded-full text-[#2b2b2b] hover:bg-white/70 hover:text-[#7CB342] transition-all"
+                className="p-2 rounded-full text-[#1c130d] hover:bg-[#F5E6C8]/60 hover:text-[#7CB342] transition-all"
                 aria-label="Checkout"
               >
                 <CreditCard className="w-6 h-6 md:w-7 md:h-7" />
@@ -317,7 +323,7 @@ export default function Navbar() {
         )}
       </AnimatePresence>
 
-      {/* ============ SEARCH BAR — with live results ============ */}
+      {/* ============ SEARCH BAR ============ */}
       <AnimatePresence mode="wait">
         {isSearchOpen && (
           <motion.div
@@ -326,7 +332,7 @@ export default function Navbar() {
             initial="hidden"
             animate="visible"
             exit="exit"
-            className="fixed top-24 left-1/2 -translate-x-1/2 z-50 w-[92%] max-w-3xl"
+            className="fixed top-24 md:top-32 left-1/2 -translate-x-1/2 z-50 w-[92%] max-w-3xl"
           >
             <div className="bg-white/70 backdrop-blur-2xl rounded-3xl shadow-[0_20px_60px_-15px_rgba(43,43,43,0.25)] overflow-hidden">
               <form onSubmit={handleSearch} className="flex items-center gap-3 px-4 py-2">
@@ -356,7 +362,6 @@ export default function Navbar() {
                 </button>
               </form>
 
-              {/* Live results dropdown */}
               {searchQuery.trim().length >= 2 && (
                 <div className="border-t border-[#f5e6c8] max-h-[60vh] overflow-y-auto">
                   {searchResults.length === 0 ? (
@@ -388,7 +393,6 @@ export default function Navbar() {
                             onClick={handleResultClick}
                             className="flex items-center gap-4 px-5 py-3 hover:bg-[#FFF6E5] transition-colors"
                           >
-                            {/* Thumbnail */}
                             <div className="relative w-12 h-12 flex-shrink-0 rounded-lg overflow-hidden bg-[#f5e6c8]">
                               {product.image ? (
                                 <Image
@@ -405,7 +409,6 @@ export default function Navbar() {
                               )}
                             </div>
 
-                            {/* Info */}
                             <div className="flex-1 min-w-0">
                               <p className="text-sm font-semibold text-[#2b2b2b] line-clamp-1">
                                 {product.title}
@@ -422,7 +425,6 @@ export default function Navbar() {
                         </li>
                       ))}
 
-                      {/* Footer link to full search */}
                       <li className="border-t border-[#f5e6c8]">
                         <Link
                           href={`/products?q=${encodeURIComponent(searchQuery)}`}

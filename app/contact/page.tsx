@@ -6,16 +6,36 @@ export const metadata = {
   description: 'Get in touch with Tiny Soul',
 };
 
+const PALETTE = {
+  cream: '#FDF6E3',
+  creamDeep: '#F5E6C8',
+  teal: '#0F766E',
+  tealSoft: '#E6F4F1',
+  coral: '#F4713A',
+  ink: '#1c130d',
+  muted: '#6f6248',
+  mutedLight: '#948362',
+};
+
 export default function ContactPage() {
   return (
-    <main className="pt-24 md:pt-28">
+    <main
+      className="min-h-screen pt-20 md:pt-24"
+      style={{ backgroundColor: PALETTE.cream }}
+    >
       <div className="container mx-auto px-4 py-12 max-w-3xl">
         <div className="text-center mb-12">
-          <h1 className="text-4xl md:text-5xl font-bold text-teal-700 tracking-tight">
+          <h1
+            className="text-4xl md:text-5xl font-bold tracking-tight"
+            style={{ color: PALETTE.teal }}
+          >
             Get in Touch
           </h1>
-          <p className="mt-3 text-gray-600 text-lg">
-            We'd love to hear from you. Reach out anytime.
+          <p
+            className="mt-3 text-lg"
+            style={{ color: PALETTE.muted }}
+          >
+            We&apos;d love to hear from you. Reach out anytime.
           </p>
         </div>
 
@@ -25,65 +45,124 @@ export default function ContactPage() {
             href="https://wa.me/923024380139"
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-4 p-6 bg-white rounded-2xl border border-gray-100 hover:border-teal-300 transition-colors group"
+            className="flex items-center gap-4 p-6 rounded-2xl border transition-all hover:scale-[1.01] hover:shadow-md group"
+            style={{
+              backgroundColor: PALETTE.cream,
+              borderColor: PALETTE.creamDeep,
+            }}
           >
-            <div className="w-14 h-14 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
+            <div
+              className="w-14 h-14 rounded-full flex items-center justify-center flex-shrink-0"
+              style={{ backgroundColor: '#DCFCE7' }}
+            >
               <MessageCircle className="w-7 h-7 text-green-600" />
             </div>
             <div>
-              <h3 className="font-semibold text-gray-900 group-hover:text-teal-700 transition-colors">
+              <h3
+                className="font-semibold transition-colors group-hover:opacity-80"
+                style={{ color: PALETTE.ink }}
+              >
                 WhatsApp
               </h3>
-              <p className="text-sm text-gray-500">+92 302 4380139</p>
+              <p className="text-sm" style={{ color: PALETTE.muted }}>
+                +92 302 4380139
+              </p>
             </div>
           </a>
 
           {/* Phone */}
           <a
             href="tel:+923024380139"
-            className="flex items-center gap-4 p-6 bg-white rounded-2xl border border-gray-100 hover:border-teal-300 transition-colors group"
+            className="flex items-center gap-4 p-6 rounded-2xl border transition-all hover:scale-[1.01] hover:shadow-md group"
+            style={{
+              backgroundColor: PALETTE.cream,
+              borderColor: PALETTE.creamDeep,
+            }}
           >
-            <div className="w-14 h-14 rounded-full bg-teal-100 flex items-center justify-center flex-shrink-0">
-              <Phone className="w-7 h-7 text-teal-600" />
+            <div
+              className="w-14 h-14 rounded-full flex items-center justify-center flex-shrink-0"
+              style={{ backgroundColor: PALETTE.tealSoft }}
+            >
+              <Phone
+                className="w-7 h-7"
+                style={{ color: PALETTE.teal }}
+              />
             </div>
             <div>
-              <h3 className="font-semibold text-gray-900 group-hover:text-teal-700 transition-colors">
+              <h3
+                className="font-semibold transition-colors group-hover:opacity-80"
+                style={{ color: PALETTE.ink }}
+              >
                 Phone
               </h3>
-              <p className="text-sm text-gray-500">+92 302 4380139</p>
+              <p className="text-sm" style={{ color: PALETTE.muted }}>
+                +92 302 4380139
+              </p>
             </div>
           </a>
 
           {/* Email */}
           <a
             href="mailto:info@tinysoul.pk"
-            className="flex items-center gap-4 p-6 bg-white rounded-2xl border border-gray-100 hover:border-teal-300 transition-colors group"
+            className="flex items-center gap-4 p-6 rounded-2xl border transition-all hover:scale-[1.01] hover:shadow-md group"
+            style={{
+              backgroundColor: PALETTE.cream,
+              borderColor: PALETTE.creamDeep,
+            }}
           >
-            <div className="w-14 h-14 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
-              <Mail className="w-7 h-7 text-blue-600" />
+            <div
+              className="w-14 h-14 rounded-full flex items-center justify-center flex-shrink-0"
+              style={{ backgroundColor: '#E0F2FE' }}
+            >
+              <Mail className="w-7 h-7 text-sky-600" />
             </div>
             <div>
-              <h3 className="font-semibold text-gray-900 group-hover:text-teal-700 transition-colors">
+              <h3
+                className="font-semibold transition-colors group-hover:opacity-80"
+                style={{ color: PALETTE.ink }}
+              >
                 Email
               </h3>
-              <p className="text-sm text-gray-500">info@tinysoul.pk</p>
+              <p className="text-sm" style={{ color: PALETTE.muted }}>
+                info@tinysoul.pk
+              </p>
             </div>
           </a>
 
           {/* Address */}
-          <div className="flex items-center gap-4 p-6 bg-white rounded-2xl border border-gray-100">
-            <div className="w-14 h-14 rounded-full bg-rose-100 flex items-center justify-center flex-shrink-0">
+          <div
+            className="flex items-center gap-4 p-6 rounded-2xl border"
+            style={{
+              backgroundColor: PALETTE.cream,
+              borderColor: PALETTE.creamDeep,
+            }}
+          >
+            <div
+              className="w-14 h-14 rounded-full flex items-center justify-center flex-shrink-0"
+              style={{ backgroundColor: '#FFE4E6' }}
+            >
               <MapPin className="w-7 h-7 text-rose-600" />
             </div>
             <div>
-              <h3 className="font-semibold text-gray-900">Location</h3>
-              <p className="text-sm text-gray-500">Pakistan</p>
+              <h3 className="font-semibold" style={{ color: PALETTE.ink }}>
+                Location
+              </h3>
+              <p className="text-sm" style={{ color: PALETTE.muted }}>
+                Pakistan
+              </p>
             </div>
           </div>
         </div>
 
-        <div className="mt-12 p-6 bg-teal-50 rounded-2xl border border-teal-100 text-center">
-          <p className="text-teal-800">
+        {/* Info footer */}
+        <div
+          className="mt-12 p-6 rounded-2xl border text-center"
+          style={{
+            backgroundColor: PALETTE.tealSoft,
+            borderColor: '#B8E0D9',
+          }}
+        >
+          <p style={{ color: PALETTE.teal }}>
             For order inquiries, please have your order details ready when you contact us.
           </p>
         </div>

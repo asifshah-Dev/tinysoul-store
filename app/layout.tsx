@@ -31,23 +31,30 @@ export default function RootLayout({
             <CartDrawer />
 
             {/* ============================================================
-                FOOTER — warm cream, brand colors, no newsletter
+                FOOTER — same cream gradient as the rest of the page,
+                no top border, no top margin. Flows seamlessly from
+                the section above it.
                 ============================================================ */}
-            <footer className="relative mt-20 bg-[#FFFCF6] border-t border-[#f5e6c8]">
-              <div className="container mx-auto px-6 py-16 md:py-20">
+            <footer
+              className="relative mt-0"
+              style={{
+                background: 'linear-gradient(180deg, #FDF6E3 0%, #F5E6C8 100%)',
+              }}
+            >
+              <div className="container mx-auto px-6 pt-10 md:pt-14 pb-16 md:pb-20">
                 <div className="grid grid-cols-1 md:grid-cols-12 gap-10 md:gap-8">
 
                   {/* Brand column */}
                   <div className="md:col-span-6">
                     <Link href="/" className="inline-block mb-6">
-  <Image
-    src="/logo.png"
-    alt="Tiny Soul"
-    width={400}
-    height={140}
-    className="h-20 md:h-32 w-auto object-contain"
-  />
-</Link>
+                      <Image
+                        src="/logo.png"
+                        alt="Tiny Soul"
+                        width={400}
+                        height={140}
+                        className="h-20 md:h-32 w-auto object-contain"
+                      />
+                    </Link>
                     <p className="text-sm text-[#6f6248] max-w-sm leading-relaxed">
                       Premium kids wear curated with love and care. Every piece is made for little souls who love to play, explore, and grow.
                     </p>
@@ -118,8 +125,8 @@ export default function RootLayout({
                   </div>
                 </div>
 
-                {/* Bottom bar */}
-                <div className="mt-14 pt-8 border-t border-[#f5e6c8] flex flex-col md:flex-row items-center justify-between gap-4">
+                {/* Bottom bar — subtle divider is preserved but lighter */}
+                <div className="mt-12 pt-8 border-t border-[#1c130d]/8 flex flex-col md:flex-row items-center justify-between gap-4">
                   <p className="text-xs text-[#948362]">
                     © {new Date().getFullYear()} Tiny Soul. All rights reserved.
                   </p>

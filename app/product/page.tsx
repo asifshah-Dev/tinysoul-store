@@ -22,16 +22,22 @@ export default async function ProductsPage() {
   }).length;
 
   return (
-    <main className="pt-24 md:pt-28">
+    <main
+      className="min-h-screen pt-20 md:pt-24"
+      style={{ backgroundColor: '#FDF6E3' }}
+    >
       <div className="container mx-auto px-4 py-8">
         <div className="mb-8">
-          <h1 className="text-3xl md:text-4xl font-bold text-teal-700 tracking-tight">
+          <h1
+            className="text-3xl md:text-4xl font-bold tracking-tight"
+            style={{ color: '#0F766E' }}
+          >
             All Products
           </h1>
-          <p className="mt-2 text-gray-500">
+          <p className="mt-2" style={{ color: '#6f6248' }}>
             {availableCount} products available
             {availableCount !== products.length && (
-              <span className="text-gray-400">
+              <span style={{ color: '#948362' }}>
                 {' '}
                 ({products.length - availableCount} sold out)
               </span>

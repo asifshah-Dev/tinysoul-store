@@ -20,33 +20,33 @@ const CATEGORIES: Category[] = [
     href: '/products/new-arrivals',
     label: 'New Arrivals',
     Icon: Sparkles,
-    bg: 'bg-[#f3fbf3]',
-    text: 'text-[#368036]',
-    border: 'border-[#b8e8b8]',
+    bg: 'bg-[#e6fae6]',
+    text: 'text-[#0f8a0f]',
+    border: 'border-[#7ee07e]',
   },
   {
     href: '/products/summer',
     label: 'Summer',
     Icon: Sun,
-    bg: 'bg-[#fffaf0]',
-    text: 'text-[#a87600]',
-    border: 'border-[#ffe4a3]',
+    bg: 'bg-[#fff3d1]',
+    text: 'text-[#d97706]',
+    border: 'border-[#ffc94d]',
   },
   {
     href: '/products/winter',
     label: 'Winter',
     Icon: Snowflake,
-    bg: 'bg-[#eff9fe]',
-    text: 'text-[#156fa0]',
-    border: 'border-[#a8ddf5]',
+    bg: 'bg-[#dcf3ff]',
+    text: 'text-[#0284c7]',
+    border: 'border-[#7dd3fc]',
   },
   {
     href: '/products/sale',
     label: 'Sale',
     Icon: Tag,
-    bg: 'bg-[#fff2f7]',
-    text: 'text-[#c93a68]',
-    border: 'border-[#ffb8d3]',
+    bg: 'bg-[#ffe4ee]',
+    text: 'text-[#e11d6b]',
+    border: 'border-[#ff8fb8]',
   },
 ];
 
@@ -121,7 +121,7 @@ export default function CategoryStrip() {
                     className={`
                       flex items-center justify-center
                       w-12 h-12 rounded-full
-                      bg-white/70 ${cat.text}
+                      bg-white/80 ${cat.text}
                       group-hover:scale-110 transition-transform duration-300
                     `}
                   >
@@ -238,7 +238,7 @@ export default function CategoryStrip() {
                           className={`
                             flex items-center justify-center
                             w-12 h-12 rounded-full
-                            bg-white/70 ${cat.text}
+                            bg-white/80 ${cat.text}
                             group-active:scale-110 transition-transform duration-200
                           `}
                         >

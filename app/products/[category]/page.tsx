@@ -28,7 +28,7 @@ export async function generateMetadata({ params }: PageProps) {
 }
 
 // ============================================================
-// PRICE HELPERS — safe for both data shapes
+// PRICE HELPERS
 // ============================================================
 function getFirstVariant(product: any): any {
   if (!product?.variants) return null;
@@ -66,11 +66,6 @@ function isOnSale(product: any): boolean {
   return compareAt > price && price > 0;
 }
 
-// ============================================================
-// AVAILABILITY HELPER
-// Returns false only when the first variant is explicitly
-// marked availableForSale === false. Missing field => available.
-// ============================================================
 function isSoldOut(product: any): boolean {
   const variant = getFirstVariant(product);
   if (!variant) return false;
@@ -94,7 +89,6 @@ export default async function CategoryPage({ params }: PageProps) {
   } else if (category === 'new-arrivals') {
     filtered = allProducts.slice(0, 12);
   } else if (category === 'summer') {
-    // Summer = all girls' items
     filtered = allProducts.filter((p: any) => {
       const title = (p.title || '').toLowerCase();
       const type = (p.productType || '').toLowerCase();
@@ -106,7 +100,6 @@ export default async function CategoryPage({ params }: PageProps) {
       );
     });
   } else if (category === 'winter') {
-    // ✅ Winter = ONLY boys' track suits
     filtered = allProducts.filter((p: any) => {
       const type = (p.productType || '').toLowerCase().trim();
       const title = (p.title || '').toLowerCase();
@@ -114,22 +107,28 @@ export default async function CategoryPage({ params }: PageProps) {
     });
   }
 
-  // Count how many of the filtered products are still available
   const soldOutCount = filtered.filter((p: any) => isSoldOut(p)).length;
   const availableCount = filtered.length - soldOutCount;
 
   return (
-    <main className="pt-24 md:pt-28">
+    <main
+      className="min-h-screen pt-20 md:pt-24"
+      style={{ backgroundColor: '#FDF6E3' }}
+    >
       <div className="container mx-auto px-4 py-8">
         <div className="mb-8">
-          <h1 className="text-3xl md:text-4xl font-bold text-teal-700 tracking-tight">
+          <h1
+            className="text-3xl md:text-4xl font-bold tracking-tight"
+            style={{ color: '#0F766E' }}
+          >
             {label}
           </h1>
-          <p className="mt-2 text-gray-500">
+          <p className="mt-2" style={{ color: '#6f6248' }}>
             {availableCount} products available
             {soldOutCount > 0 && (
-              <span className="text-gray-400">
-                {' '}· {soldOutCount} sold out
+              <span style={{ color: '#948362' }}>
+                {' '}
+                · {soldOutCount} sold out
               </span>
             )}
           </p>

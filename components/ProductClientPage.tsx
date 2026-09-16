@@ -4,13 +4,27 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { useState, useEffect, useMemo, useRef } from 'react';
-import { ShoppingBag, Plus, Minus, ZoomIn, ZoomOut } from 'lucide-react';
+import { ShoppingBag, Plus, Minus, ZoomIn, ZoomOut, Ruler } from 'lucide-react';
 import { fetchProductByHandle } from '@/lib/data-source';
 import { useCart } from '@/context/CartContext';
+import SizeChartModal from './SizeChartModal';
 
 interface ProductClientProps {
   handle: string;
 }
+
+// ============================================================
+// PALETTE — matches the rest of the site
+// ============================================================
+const PALETTE = {
+  cream: '#FDF6E3',
+  creamDeep: '#F5E6C8',
+  teal: '#0F766E',
+  tealSoft: '#E6F4F1',
+  coral: '#F4713A',
+  ink: '#1c130d',
+  muted: '#6f6248',
+};
 
 // ============================================================
 // HELPERS
@@ -51,15 +65,16 @@ function getOption(variant: any, name: string): string {
   return opt?.value || '';
 }
 
-// ═══ AVAILABILITY ═══
 function isVariantAvailable(variant: any): boolean {
   if (!variant) return false;
   return variant.availableForSale !== false;
 }
 
 // ============================================================
-// BgRemovedImage
+// BgRemovedImage — global cache
 // ============================================================
+const bgRemovedCache = new Map<string, string>();
+
 function BgRemovedImage({
   src,
   alt,
@@ -71,10 +86,20 @@ function BgRemovedImage({
   className?: string;
   tolerance?: number;
 }) {
-  const [processedSrc, setProcessedSrc] = useState<string>(src);
-  const [isProcessing, setIsProcessing] = useState(true);
+  const [processedSrc, setProcessedSrc] = useState<string>(
+    () => bgRemovedCache.get(src) ?? src
+  );
+  const [isProcessing, setIsProcessing] = useState(
+    () => !bgRemovedCache.has(src)
+  );
 
   useEffect(() => {
+    if (bgRemovedCache.has(src)) {
+      setProcessedSrc(bgRemovedCache.get(src)!);
+      setIsProcessing(false);
+      return;
+    }
+
     let isMounted = true;
     const img = new window.Image();
     if (src.startsWith('http')) img.crossOrigin = 'anonymous';
@@ -88,36 +113,59 @@ function BgRemovedImage({
         canvas.width = w;
         canvas.height = h;
         const ctx = canvas.getContext('2d', { willReadFrequently: true });
-        if (!ctx) { setIsProcessing(false); return; }
+        if (!ctx) {
+          setIsProcessing(false);
+          return;
+        }
 
         ctx.drawImage(img, 0, 0, w, h);
         const imageData = ctx.getImageData(0, 0, w, h);
         const data = imageData.data;
 
         for (let i = 0; i < data.length; i += 4) {
-          if (data[i] >= tolerance && data[i + 1] >= tolerance && data[i + 2] >= tolerance) {
+          if (
+            data[i] >= tolerance &&
+            data[i + 1] >= tolerance &&
+            data[i + 2] >= tolerance
+          ) {
             data[i + 3] = 0;
           }
         }
         ctx.putImageData(imageData, 0, 0);
+        const out = canvas.toDataURL('image/png');
+        bgRemovedCache.set(src, out);
         if (isMounted) {
-          setProcessedSrc(canvas.toDataURL('image/png'));
+          setProcessedSrc(out);
           setIsProcessing(false);
         }
       } catch {
-        if (isMounted) { setProcessedSrc(src); setIsProcessing(false); }
+        bgRemovedCache.set(src, src);
+        if (isMounted) {
+          setProcessedSrc(src);
+          setIsProcessing(false);
+        }
       }
     };
-    img.onerror = () => { if (isMounted) { setProcessedSrc(src); setIsProcessing(false); } };
+    img.onerror = () => {
+      bgRemovedCache.set(src, src);
+      if (isMounted) {
+        setProcessedSrc(src);
+        setIsProcessing(false);
+      }
+    };
     img.src = src;
-    return () => { isMounted = false; };
+    return () => {
+      isMounted = false;
+    };
   }, [src, tolerance]);
 
   return (
     <img
       src={processedSrc}
       alt={alt}
-      className={`${className} transition-opacity duration-300 ${isProcessing ? 'opacity-0' : 'opacity-100'}`}
+      className={`${className} transition-opacity duration-300 ${
+        isProcessing ? 'opacity-0' : 'opacity-100'
+      }`}
     />
   );
 }
@@ -131,12 +179,12 @@ export default function ProductClientPage({ handle }: ProductClientProps) {
   const [quantity, setQuantity] = useState(1);
   const [isAdding, setIsAdding] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
+  const [isSizeChartOpen, setIsSizeChartOpen] = useState(false);
   const { addToCart } = useCart();
 
   const [selectedSize, setSelectedSize] = useState<string>('');
   const [selectedColor, setSelectedColor] = useState<string>('');
 
-  // ═══ Zoom state ═══
   const [isZoomed, setIsZoomed] = useState(false);
   const [zoomOrigin, setZoomOrigin] = useState({ x: 50, y: 50 });
   const imageContainerRef = useRef<HTMLDivElement>(null);
@@ -150,8 +198,7 @@ export default function ProductClientPage({ handle }: ProductClientProps) {
         if (data) {
           const variants = getVariants(data);
           const first =
-            variants.find((v: any) => isVariantAvailable(v)) ||
-            variants[0];
+            variants.find((v: any) => isVariantAvailable(v)) || variants[0];
           if (first) {
             setSelectedColor(getOption(first, 'color'));
             setSelectedSize(getOption(first, 'size'));
@@ -186,7 +233,6 @@ export default function ProductClientPage({ handle }: ProductClientProps) {
     return sizes;
   }, [variants]);
 
-  // ═══ Which colors/sizes have at least one available variant? ═══
   const availableColors = useMemo(() => {
     const set = new Set<string>();
     variants.forEach((v: any) => {
@@ -209,7 +255,6 @@ export default function ProductClientPage({ handle }: ProductClientProps) {
     return set;
   }, [variants]);
 
-  // ═══ Is the whole product sold out? ═══
   const allSoldOut = useMemo(() => {
     if (variants.length === 0) return false;
     return variants.every((v: any) => !isVariantAvailable(v));
@@ -225,7 +270,9 @@ export default function ProductClientPage({ handle }: ProductClientProps) {
     });
 
     if (!match && selectedColor) {
-      match = variants.find((v: any) => getOption(v, 'color') === selectedColor);
+      match = variants.find(
+        (v: any) => getOption(v, 'color') === selectedColor
+      );
     }
     return match || variants[0] || null;
   }, [variants, selectedColor, selectedSize]);
@@ -233,16 +280,16 @@ export default function ProductClientPage({ handle }: ProductClientProps) {
   const selectedAvailable = isVariantAvailable(selectedVariant);
   const soldOut = !selectedAvailable;
 
-  // ═══ Auto-correct: if current combo is sold out, pick an available one ═══
   useEffect(() => {
     if (!selectedVariant) return;
     if (isVariantAvailable(selectedVariant)) return;
 
-    const fallback = variants.find(
-      (v: any) =>
-        isVariantAvailable(v) &&
-        (!selectedColor || getOption(v, 'color') === selectedColor)
-    ) || variants.find((v: any) => isVariantAvailable(v));
+    const fallback =
+      variants.find(
+        (v: any) =>
+          isVariantAvailable(v) &&
+          (!selectedColor || getOption(v, 'color') === selectedColor)
+      ) || variants.find((v: any) => isVariantAvailable(v));
 
     if (fallback) {
       setSelectedColor(getOption(fallback, 'color'));
@@ -284,10 +331,7 @@ export default function ProductClientPage({ handle }: ProductClientProps) {
   }, [selectedImage, selectedColor]);
 
   const mainImage =
-    colorImages[selectedImage] ||
-    colorImages[0] ||
-    product?.image ||
-    '';
+    colorImages[selectedImage] || colorImages[0] || product?.image || '';
 
   const handleImageClick = (e: React.MouseEvent<HTMLDivElement>) => {
     if ((e.target as HTMLElement).closest('[data-zoom-reset]')) return;
@@ -315,7 +359,8 @@ export default function ProductClientPage({ handle }: ProductClientProps) {
 
     setIsAdding(true);
 
-    const price = getPrice(selectedVariant) || parseFloat(product?.price || '0');
+    const price =
+      getPrice(selectedVariant) || parseFloat(product?.price || '0');
     const image = colorImages[0] || product?.image || '';
 
     const selectedOptions = Array.isArray(selectedVariant?.selectedOptions)
@@ -347,8 +392,11 @@ export default function ProductClientPage({ handle }: ProductClientProps) {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center pt-20 md:pt-28">
-        <div className="text-gray-500">Loading...</div>
+      <div
+        className="min-h-screen flex items-center justify-center pt-20 md:pt-28"
+        style={{ backgroundColor: PALETTE.cream }}
+      >
+        <div className="text-[#6f6248]">Loading...</div>
       </div>
     );
   }
@@ -357,33 +405,59 @@ export default function ProductClientPage({ handle }: ProductClientProps) {
     notFound();
   }
 
-  const price = getPrice(selectedVariant) || parseFloat(product.price || '0');
+  const price =
+    getPrice(selectedVariant) || parseFloat(product.price || '0');
   const compareAt = getCompareAtPrice(selectedVariant);
   const onSale = compareAt > price && price > 0;
-  const discountPercent = onSale ? Math.round(((compareAt - price) / compareAt) * 100) : 0;
+  const discountPercent = onSale
+    ? Math.round(((compareAt - price) / compareAt) * 100)
+    : 0;
 
   const totalPrice = price * quantity;
 
-  return (
-    <div className="min-h-screen pt-20 md:pt-28">
-      <div className="container mx-auto px-4 py-4 md:py-8">
+  const sizeChartCategory: 'girls' | 'boys' =
+    (product?.title || '').toLowerCase().includes('boy') ||
+    (product?.productType || '').toLowerCase().includes('boy')
+      ? 'boys'
+      : 'girls';
 
-        <nav className="text-xs md:text-sm text-gray-500 mb-4 md:mb-6 flex items-center flex-wrap gap-y-1">
-          <Link href="/" className="hover:text-teal-600 transition-colors">Home</Link>
+  return (
+    <div
+      className="min-h-screen pt-20 md:pt-28"
+      style={{ backgroundColor: PALETTE.cream }}
+    >
+      <div className="container mx-auto px-4 py-4 md:py-8">
+        <nav className="text-xs md:text-sm text-[#6f6248] mb-4 md:mb-6 flex items-center flex-wrap gap-y-1">
+          <Link href="/" className="hover:text-[#F4713A] transition-colors">
+            Home
+          </Link>
           <span className="mx-2">/</span>
-          <Link href="/products" className="hover:text-teal-600 transition-colors">Products</Link>
+          <Link
+            href="/products"
+            className="hover:text-[#F4713A] transition-colors"
+          >
+            Products
+          </Link>
           <span className="mx-2">/</span>
-          <span className="text-gray-800 font-medium line-clamp-1">{product.title}</span>
+          <span className="text-[#1c130d] font-medium line-clamp-1">
+            {product.title}
+          </span>
         </nav>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 lg:gap-12 p-4 md:p-8 border border-gray-100 rounded-2xl">
-
+        <div
+          className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 lg:gap-12 p-4 md:p-8 rounded-2xl border"
+          style={{
+            backgroundColor: PALETTE.cream,
+            borderColor: PALETTE.creamDeep,
+          }}
+        >
           {/* ═══ LEFT — Images ═══ */}
           <div>
             <div
               ref={imageContainerRef}
               onClick={handleImageClick}
-              className="relative h-72 sm:h-80 md:h-96 rounded-xl overflow-hidden bg-[#faf7f2] cursor-zoom-in select-none"
+              className="relative h-72 sm:h-80 md:h-96 rounded-xl overflow-hidden cursor-zoom-in select-none"
+              style={{ backgroundColor: '#FAF7F2' }}
             >
               {mainImage ? (
                 <div
@@ -402,31 +476,39 @@ export default function ProductClientPage({ handle }: ProductClientProps) {
                   />
                 </div>
               ) : (
-                <div className="flex items-center justify-center h-full text-gray-400 text-sm">
+                <div className="flex items-center justify-center h-full text-[#6f6248] text-sm">
                   No image available
                 </div>
               )}
 
-              {/* ═══ Red Sold Out label over the image ═══ */}
+              {/* Sold Out badge */}
               {soldOut && (
                 <div className="absolute top-3 left-3 md:top-4 md:left-4 z-20 px-3 py-1 md:px-4 md:py-1.5 rounded text-[10px] md:text-xs font-bold uppercase tracking-[0.15em] text-white bg-red-600 shadow-md">
                   Sold Out
                 </div>
               )}
 
+              {/* Zoom hint */}
               {!isZoomed && mainImage && (
-                <div className="pointer-events-none absolute bottom-3 right-3 md:bottom-4 md:right-4 z-10 flex items-center gap-1.5 px-2.5 py-1.5 rounded-full bg-white/80 backdrop-blur-sm text-[10px] md:text-xs font-semibold text-[#6f6248] shadow-sm">
+                <div
+                  className="pointer-events-none absolute bottom-3 right-3 md:bottom-4 md:right-4 z-10 flex items-center gap-1.5 px-2.5 py-1.5 rounded-full backdrop-blur-sm text-[10px] md:text-xs font-semibold shadow-sm"
+                  style={{
+                    backgroundColor: 'rgba(255,255,255,0.85)',
+                    color: PALETTE.muted,
+                  }}
+                >
                   <ZoomIn className="w-3.5 h-3.5" />
                   <span className="hidden sm:inline">Tap to zoom</span>
                   <span className="sm:hidden">Zoom</span>
                 </div>
               )}
 
+              {/* Reset zoom */}
               {isZoomed && (
                 <button
                   data-zoom-reset
                   onClick={handleResetZoom}
-                  className="absolute bottom-3 right-3 md:bottom-4 md:right-4 z-20 flex items-center gap-1.5 px-3 py-2 md:px-3.5 md:py-2 rounded-full bg-white shadow-md hover:bg-[#FFF5ED] active:scale-95 transition-all text-[10px] md:text-xs font-bold text-[#2b2b2b] cursor-pointer"
+                  className="absolute bottom-3 right-3 md:bottom-4 md:right-4 z-20 flex items-center gap-1.5 px-3 py-2 md:px-3.5 md:py-2 rounded-full bg-white shadow-md hover:bg-[#FFF5ED] active:scale-95 transition-all text-[10px] md:text-xs font-bold text-[#1c130d] cursor-pointer"
                   aria-label="Reset zoom"
                 >
                   <ZoomOut className="w-3.5 h-3.5 md:w-4 md:h-4" />
@@ -442,9 +524,12 @@ export default function ProductClientPage({ handle }: ProductClientProps) {
                   <button
                     key={index}
                     onClick={() => setSelectedImage(index)}
-                    className={`relative w-14 h-14 md:w-20 md:h-20 flex-shrink-0 rounded-lg overflow-hidden border-2 transition-colors bg-[#faf7f2] ${
-                      selectedImage === index ? 'border-teal-600' : 'border-gray-200'
-                    } hover:border-teal-400`}
+                    className="relative w-14 h-14 md:w-20 md:h-20 flex-shrink-0 rounded-lg overflow-hidden border-2 transition-colors"
+                    style={{
+                      backgroundColor: '#FAF7F2',
+                      borderColor:
+                        selectedImage === index ? PALETTE.teal : PALETTE.creamDeep,
+                    }}
                   >
                     <BgRemovedImage
                       src={image}
@@ -460,42 +545,42 @@ export default function ProductClientPage({ handle }: ProductClientProps) {
 
           {/* ═══ RIGHT — Details ═══ */}
           <div>
-            <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 leading-tight">
+            <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-[#1c130d] leading-tight">
               {product.title.split('|')[0]?.trim() || product.title}
             </h1>
 
-            {/* ═══ Sold-out inline label (below title) ═══ */}
             {(soldOut || allSoldOut) && (
               <div className="mt-3 inline-block px-3 py-1 rounded text-[11px] font-semibold uppercase tracking-[0.15em] text-white bg-red-600">
                 Sold Out
               </div>
             )}
 
+            {/* Price */}
             <div className="mt-3 md:mt-4 flex items-center gap-2 md:gap-3 flex-wrap">
-              <span className="text-2xl md:text-3xl font-bold text-teal-600">
+              <span className="text-2xl md:text-3xl font-bold text-[#0F766E]">
                 Rs {totalPrice.toLocaleString()}
               </span>
               {onSale && (
                 <>
-                  <span className="text-base md:text-lg text-gray-400 line-through">
+                  <span className="text-base md:text-lg text-[#6f6248] line-through opacity-70">
                     Rs {(compareAt * quantity).toLocaleString()}
                   </span>
-                  <span className="text-[10px] font-semibold uppercase tracking-[0.15em] text-[#2b2b2b] bg-[#f5e6c8] px-2 py-1 rounded">
+                  <span className="text-[10px] font-semibold uppercase tracking-[0.15em] text-[#1c130d] bg-[#F5E6C8] px-2 py-1 rounded">
                     Save {discountPercent}%
                   </span>
                 </>
               )}
               {quantity > 1 && (
-                <span className="text-xs md:text-sm text-gray-400 w-full">
+                <span className="text-xs md:text-sm text-[#6f6248] w-full">
                   (Rs {price.toLocaleString()} × {quantity})
                 </span>
               )}
             </div>
 
-            {/* ═══ Colors ═══ */}
+            {/* Colors */}
             {colorOptions.length > 0 && (
               <div className="mt-5 md:mt-6">
-                <label className="text-xs md:text-sm font-medium text-gray-700 block mb-2">
+                <label className="text-xs md:text-sm font-medium text-[#1c130d] block mb-2">
                   Color
                 </label>
                 <div className="flex flex-wrap gap-2">
@@ -507,13 +592,25 @@ export default function ProductClientPage({ handle }: ProductClientProps) {
                         key={color}
                         disabled={!isAvailable}
                         onClick={() => isAvailable && setSelectedColor(color)}
-                        className={`px-3 py-1.5 md:px-4 md:py-2 rounded-lg text-xs md:text-sm font-medium border-2 transition-all ${
-                          !isAvailable
-                            ? 'border-gray-200 text-gray-300 line-through cursor-not-allowed opacity-60'
+                        className="px-3 py-1.5 md:px-4 md:py-2 rounded-lg text-xs md:text-sm font-medium border-2 transition-all"
+                        style={{
+                          borderColor: !isAvailable
+                            ? PALETTE.creamDeep
                             : isSelected
-                            ? 'border-teal-600 bg-teal-50 text-teal-700'
-                            : 'border-gray-200 text-gray-700 hover:border-teal-400 hover:text-teal-700'
-                        }`}
+                            ? PALETTE.teal
+                            : PALETTE.creamDeep,
+                          backgroundColor: isSelected
+                            ? PALETTE.tealSoft
+                            : 'transparent',
+                          color: !isAvailable
+                            ? '#c4b89a'
+                            : isSelected
+                            ? PALETTE.teal
+                            : PALETTE.ink,
+                          opacity: !isAvailable ? 0.6 : 1,
+                          textDecoration: !isAvailable ? 'line-through' : 'none',
+                          cursor: !isAvailable ? 'not-allowed' : 'pointer',
+                        }}
                       >
                         {color}
                       </button>
@@ -523,12 +620,29 @@ export default function ProductClientPage({ handle }: ProductClientProps) {
               </div>
             )}
 
-            {/* ═══ Sizes ═══ */}
+            {/* Sizes + Size Chart link */}
             {sizeOptions.length > 0 && (
               <div className="mt-5 md:mt-6">
-                <label className="text-xs md:text-sm font-medium text-gray-700 block mb-2">
-                  Size
-                </label>
+                <div className="flex items-center justify-between mb-2">
+                  <label className="text-xs md:text-sm font-medium text-[#1c130d]">
+                    Size
+                  </label>
+
+                  {/* ═══ Prominent Size Chart button ═══ */}
+                  <button
+                    type="button"
+                    onClick={() => setIsSizeChartOpen(true)}
+                    className="group inline-flex items-center gap-1.5 px-3 py-1.5 md:px-3.5 md:py-2 rounded-full text-xs md:text-sm font-bold transition-all hover:scale-105 active:scale-95 shadow-sm"
+                    style={{
+                      backgroundColor: PALETTE.teal,
+                      color: '#ffffff',
+                    }}
+                    aria-label="Open size chart"
+                  >
+                    <Ruler className="w-3.5 h-3.5 md:w-4 md:h-4" />
+                    Size Chart
+                  </button>
+                </div>
                 <div className="flex flex-wrap gap-2">
                   {sizeOptions.map((size) => {
                     const isSelected = selectedSize === size;
@@ -538,13 +652,25 @@ export default function ProductClientPage({ handle }: ProductClientProps) {
                         key={size}
                         disabled={!isAvailable}
                         onClick={() => isAvailable && setSelectedSize(size)}
-                        className={`px-3 py-1.5 md:px-4 md:py-2 rounded-lg text-xs md:text-sm font-medium border-2 transition-all ${
-                          !isAvailable
-                            ? 'border-gray-200 text-gray-300 line-through cursor-not-allowed opacity-60'
+                        className="px-3 py-1.5 md:px-4 md:py-2 rounded-lg text-xs md:text-sm font-medium border-2 transition-all"
+                        style={{
+                          borderColor: !isAvailable
+                            ? PALETTE.creamDeep
                             : isSelected
-                            ? 'border-teal-600 bg-teal-50 text-teal-700'
-                            : 'border-gray-200 text-gray-700 hover:border-teal-400 hover:text-teal-700'
-                        }`}
+                            ? PALETTE.teal
+                            : PALETTE.creamDeep,
+                          backgroundColor: isSelected
+                            ? PALETTE.tealSoft
+                            : 'transparent',
+                          color: !isAvailable
+                            ? '#c4b89a'
+                            : isSelected
+                            ? PALETTE.teal
+                            : PALETTE.ink,
+                          opacity: !isAvailable ? 0.6 : 1,
+                          textDecoration: !isAvailable ? 'line-through' : 'none',
+                          cursor: !isAvailable ? 'not-allowed' : 'pointer',
+                        }}
                       >
                         {size}
                       </button>
@@ -556,35 +682,39 @@ export default function ProductClientPage({ handle }: ProductClientProps) {
 
             {product.description && (
               <div className="mt-5 md:mt-6">
-                <h3 className="text-xs md:text-sm font-semibold text-gray-400 uppercase tracking-wider mb-2">
+                <h3 className="text-xs md:text-sm font-semibold text-[#6f6248] uppercase tracking-wider mb-2">
                   Description
                 </h3>
-                <p className="text-sm md:text-base text-gray-600 leading-relaxed">
+                <p className="text-sm md:text-base text-[#4a3a2a] leading-relaxed">
                   {product.description}
                 </p>
               </div>
             )}
 
-            {/* ═══ Quantity (hidden when sold out) ═══ */}
+            {/* Quantity */}
             {!soldOut && (
               <div className="mt-5 md:mt-6">
-                <label className="text-xs md:text-sm font-medium text-gray-700 block mb-2">
+                <label className="text-xs md:text-sm font-medium text-[#1c130d] block mb-2">
                   Quantity
                 </label>
                 <div className="flex items-center gap-3">
                   <button
                     onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                    className="p-2 rounded-lg border border-gray-300 hover:bg-gray-50 transition-colors"
+                    className="p-2 rounded-lg border transition-colors hover:bg-[#FFF5ED]"
+                    style={{ borderColor: PALETTE.creamDeep }}
                     disabled={quantity <= 1}
                   >
-                    <Minus className="w-4 h-4 text-gray-600" />
+                    <Minus className="w-4 h-4 text-[#1c130d]" />
                   </button>
-                  <span className="w-12 text-center font-medium text-gray-800">{quantity}</span>
+                  <span className="w-12 text-center font-medium text-[#1c130d]">
+                    {quantity}
+                  </span>
                   <button
                     onClick={() => setQuantity(quantity + 1)}
-                    className="p-2 rounded-lg border border-gray-300 hover:bg-gray-50 transition-colors"
+                    className="p-2 rounded-lg border transition-colors hover:bg-[#FFF5ED]"
+                    style={{ borderColor: PALETTE.creamDeep }}
                   >
-                    <Plus className="w-4 h-4 text-gray-600" />
+                    <Plus className="w-4 h-4 text-[#1c130d]" />
                   </button>
                 </div>
               </div>
@@ -592,27 +722,34 @@ export default function ProductClientPage({ handle }: ProductClientProps) {
 
             <div className="mt-5 md:mt-6">
               {errorMsg && (
-                <div className={`text-sm text-center mb-3 ${errorMsg.includes('✅') ? 'text-green-600' : 'text-red-500'}`}>
+                <div
+                  className={`text-sm text-center mb-3 ${
+                    errorMsg.includes('✅') ? 'text-green-600' : 'text-red-500'
+                  }`}
+                >
                   {errorMsg}
                 </div>
               )}
               <button
                 onClick={handleAddToCart}
                 disabled={isAdding || soldOut}
-                className={`w-full py-3 md:py-4 rounded-xl font-semibold text-base md:text-lg transition-all flex items-center justify-center gap-2 ${
-                  soldOut
-                    ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                    : !isAdding
-                    ? 'bg-black hover:bg-gray-800 text-white shadow-lg'
-                    : 'bg-gray-400 text-white cursor-not-allowed'
-                }`}
+                className="w-full py-3 md:py-4 rounded-xl font-semibold text-base md:text-lg transition-all flex items-center justify-center gap-2 shadow-lg hover:scale-[1.01] active:scale-[0.99]"
+                style={{
+                  backgroundColor: soldOut
+                    ? PALETTE.creamDeep
+                    : isAdding
+                    ? PALETTE.creamDeep
+                    : PALETTE.ink,
+                  color: soldOut ? '#c4b89a' : '#ffffff',
+                  cursor: soldOut || isAdding ? 'not-allowed' : 'pointer',
+                }}
               >
                 <ShoppingBag className="w-5 h-5" />
                 {soldOut ? 'Sold Out' : isAdding ? 'Adding...' : 'Add to Cart'}
               </button>
 
               {!soldOut && (
-                <p className="text-xs md:text-sm text-gray-400 text-center mt-3">
+                <p className="text-xs md:text-sm text-[#6f6248] text-center mt-3">
                   Free shipping on orders over Rs 5000
                 </p>
               )}
@@ -620,6 +757,12 @@ export default function ProductClientPage({ handle }: ProductClientProps) {
           </div>
         </div>
       </div>
+
+      <SizeChartModal
+        isOpen={isSizeChartOpen}
+        onClose={() => setIsSizeChartOpen(false)}
+        category={sizeChartCategory}
+      />
     </div>
   );
 }

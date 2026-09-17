@@ -321,7 +321,7 @@ export default function SaleBanners() {
           duration: 0.6,
           ease: EASE,
           delay: 0.55,
-          type: 'spring',
+          type: 'spring' as const,
           stiffness: 300,
           damping: 20,
         },

@@ -130,6 +130,17 @@ export default function RootLayout({
                   <p className="text-xs text-[#948362]">
                     © {new Date().getFullYear()} Tiny Soul. All rights reserved.
                   </p>
+                  <p className="text-xs text-[#948362]">
+                    Developed by{' '}
+                    <a
+                      href="https://deltatechbridge.com/"
+                      target="_blank"
+                      rel="noreferrer"
+                      className="hover:text-[#F4713A] transition-colors"
+                    >
+                      Delta Tech Bridge
+                    </a>
+                  </p>
                   <div className="flex items-center gap-6">
                     <Link href="#" className="text-xs text-[#948362] hover:text-[#F4713A] transition-colors">
                       Privacy

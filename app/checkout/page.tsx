@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import emailjs from '@emailjs/browser';
 import { useCart } from '@/context/CartContext';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -27,6 +28,11 @@ const PALETTE = {
   muted: '#6f6248',
   mutedLight: '#948362',
 };
+
+const EMAILJS_SERVICE_ID = 'service_yjmv1wb';
+const EMAILJS_TEMPLATE_ID = 'template_21b7034';
+const EMAILJS_PUBLIC_KEY = 'HUTfLE-1oOAA83i8v';
+const ORDER_EMAIL = 'tinysoul10@gmail.com';
 
 export default function CheckoutPage() {
   const {
@@ -93,12 +99,14 @@ export default function CheckoutPage() {
     setCustomerPhone(digitsOnly);
     const error = getPhoneError(digitsOnly, selectedCountryCode);
     setPhoneError(error);
+    setSubmitError('');
   };
 
   const handleCountryChange = (code: string) => {
     setSelectedCountryCode(code);
     const error = getPhoneError(customerPhone, code);
     setPhoneError(error);
+    setSubmitError('');
   };
 
   const generateOrderSummary = () => {
@@ -132,12 +140,12 @@ export default function CheckoutPage() {
   };
 
   const handleEmailCheckout = async () => {
-    if (!customerName || !customerPhone) {
-      alert('Please fill in your name and phone number');
+    if (!customerName.trim() || !customerPhone) {
+      setSubmitError('Enter your name and phone number before sending.');
       return;
     }
     if (phoneError) {
-      alert(phoneError);
+      setSubmitError(phoneError);
       return;
     }
     setIsSubmitting(true);
@@ -145,27 +153,24 @@ export default function CheckoutPage() {
     const message = generateOrderSummary();
 
     try {
-      const response = await fetch(
-        'https://formsubmit.co/ajax/tinysoul10@gmail.com',
+      await emailjs.send(
+        EMAILJS_SERVICE_ID,
+        EMAILJS_TEMPLATE_ID,
         {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Accept: 'application/json',
-          },
-          body: JSON.stringify({
-            _subject: `New order from ${customerName}`,
-            _template: 'table',
-            customer_name: customerName,
-            customer_phone: `${selectedCountryCode} ${customerPhone}`,
-            delivery_address: customerAddress || 'Not provided',
-            order_details: message,
-            total: `Rs ${cartTotal.toLocaleString()}`,
-          }),
-        }
+          to_email: ORDER_EMAIL,
+          subject: `New order from ${customerName}`,
+          name: customerName,
+          from_name: customerName,
+          message,
+          customer_name: customerName,
+          customer_phone: `${selectedCountryCode} ${customerPhone}`,
+          delivery_address: customerAddress || 'Not provided',
+          order_details: message,
+          order_total: `Rs ${cartTotal.toLocaleString()}`,
+          item_count: cartCount,
+        },
+        { publicKey: EMAILJS_PUBLIC_KEY }
       );
-
-      if (!response.ok) throw new Error('Email service request failed');
 
       setOrderPlaced(true);
       clearCart();
@@ -262,7 +267,10 @@ export default function CheckoutPage() {
                     <input
                       type="text"
                       value={customerName}
-                      onChange={(e) => setCustomerName(e.target.value)}
+                      onChange={(e) => {
+                        setCustomerName(e.target.value);
+                        setSubmitError('');
+                      }}
                       placeholder="Enter your full name"
                       className="w-full pl-10 pr-4 py-3 rounded-lg focus:outline-none focus:ring-2 transition-all"
                       style={{
@@ -419,24 +427,19 @@ export default function CheckoutPage() {
 
                 <button
                   onClick={handleEmailCheckout}
-                  disabled={
-                    isSubmitting ||
-                    !customerName ||
-                    !customerPhone ||
-                    !!phoneError
-                  }
+                  disabled={isSubmitting}
                   className="w-full py-4 rounded-xl font-semibold text-lg transition-all flex items-center justify-center gap-2 shadow-md hover:scale-[1.01] active:scale-[0.99]"
                   style={{
                     backgroundColor:
-                      !isSubmitting && customerName && customerPhone && !phoneError
+                      !isSubmitting
                         ? '#16a34a'
                         : PALETTE.creamDeep,
                     color:
-                      !isSubmitting && customerName && customerPhone && !phoneError
+                      !isSubmitting
                         ? '#ffffff'
                         : PALETTE.mutedLight,
                     cursor:
-                      !isSubmitting && customerName && customerPhone && !phoneError
+                      !isSubmitting
                         ? 'pointer'
                         : 'not-allowed',
                   }}

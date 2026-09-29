@@ -445,7 +445,7 @@ export default function CheckoutPage() {
                   }}
                 >
                   <Mail className="w-5 h-5" />
-                  {isSubmitting ? 'Sending...' : 'Send Order via Email'}
+                  {isSubmitting ? 'Sending...' : 'Order now'}
                 </button>
                 {submitError && (
                   <p className="text-sm text-red-500 text-center">
